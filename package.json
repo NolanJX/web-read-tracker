@@ -1,6 +1,6 @@
 {
-  "name": "wxt-vue-starter",
-  "description": "manifest.json description",
+  "name": "web-read-tracker",
+  "description": "Web Read Tracker",
   "private": true,
   "version": "0.0.0",
   "type": "module",
