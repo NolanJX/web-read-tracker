@@ -1,0 +1,44 @@
+export const STATUSES = ["read", "reading", "unread"] as const;
+export type Status = (typeof STATUSES)[number];
+
+export interface WebPage {
+  url: string; // ID
+  title: string;
+  status: Status;
+  readCount: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+const webPages = storage.defineItem<WebPage[]>("local:webPages", {
+  fallback: [],
+});
+
+export async function findAllWebPages(): Promise<WebPage[]> {
+  return await webPages.getValue();
+}
+
+export async function saveWebPage(
+  webPage: Partial<WebPage> &
+    Pick<WebPage, "url" | "title" | "status" | "readCount">,
+): Promise<WebPage> {
+  const existing = await findAllWebPages();
+  const index = existing.findIndex((w) => w.url === webPage.url);
+
+  const now = Date.now();
+
+  if (index >= 0) {
+    webPage = { ...existing[index], updatedAt: now, ...webPage } as WebPage;
+    existing[index] = webPage;
+  } else {
+    webPage = {
+      createdAt: now,
+      updatedAt: now,
+      ...webPage,
+    } as WebPage;
+    existing.push(webPage);
+  }
+
+  await webPages.setValue(existing);
+  return webPage;
+}
