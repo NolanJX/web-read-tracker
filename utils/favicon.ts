@@ -27,3 +27,11 @@ export async function saveFavicon(
   map[domain] = favicon;
   await domainToFavicon.setValue(map);
 }
+
+export async function fetchFavicon(url: string): Promise<Favicon> {
+  const response = await browser.runtime.sendMessage({
+    type: "fetchFavicon",
+    url,
+  });
+  return { src: response.url, data: response.data };
+}
