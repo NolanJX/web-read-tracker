@@ -1,4 +1,11 @@
+import { createRootNode } from "@/utils/node";
+
 export default defineBackground(() => {
+  browser.runtime.onInstalled.addListener(async ({ reason }) => {
+    if (reason !== "install") return;
+    await createRootNode();
+  });
+
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === "fetchFavicon") {
       const url = message.url;
