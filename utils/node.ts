@@ -11,7 +11,7 @@ type BaseNode = {
 
 export type FolderNode = BaseNode & { type: "Folder" };
 export type DomainNode = BaseNode & { type: "Domain"; domain: Domain };
-export type WebPageNode = BaseNode & { type: "WebPage"; webPageId: string };
+export type WebPageNode = BaseNode & { type: "WebPage"; webPageUrl: string };
 
 export type Node = FolderNode | DomainNode | WebPageNode;
 export const ROOT_ID = "root";
@@ -88,7 +88,7 @@ export async function saveDomainNode(
 
 export async function saveWebPageNode(
   node: Partial<WebPageNode> &
-    Pick<WebPageNode, "name" | "parentId" | "order" | "webPageId">,
+    Pick<WebPageNode, "name" | "parentId" | "order" | "webPageUrl">,
 ): Promise<WebPageNode> {
   return (await saveNode({ ...node, type: "WebPage" })) as WebPageNode;
 }
