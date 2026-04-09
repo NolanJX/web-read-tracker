@@ -18,6 +18,11 @@ export async function findAllWebPages(): Promise<WebPage[]> {
   return await webPages.getValue();
 }
 
+export async function findWebPage(url: string): Promise<WebPage | undefined> {
+  const existing = await findAllWebPages();
+  return existing.find((w) => w.url === url);
+}
+
 export async function saveWebPage(
   webPage: Partial<WebPage> &
     Pick<WebPage, "url" | "title" | "status" | "readCount">,

@@ -12,6 +12,13 @@ const domainToFavicon = storage.defineItem<Record<Domain, Favicon>>(
   },
 );
 
+export async function findFavicon(
+  domain: Domain,
+): Promise<Favicon | undefined> {
+  const map = await domainToFavicon.getValue();
+  return map[domain];
+}
+
 export async function saveFavicon(
   domain: Domain,
   favicon: Favicon,

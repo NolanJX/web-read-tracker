@@ -24,6 +24,15 @@ export async function findAllNodes(): Promise<Node[]> {
   return await nodes.getValue();
 }
 
+export async function findWebPageNodeByUrl(
+  webPageUrl: string,
+): Promise<WebPageNode | undefined> {
+  const existing = await findAllNodes();
+  return existing.find(
+    (n) => n.type === "WebPage" && n.webPageUrl === webPageUrl,
+  );
+}
+
 export async function createRootNode(): Promise<FolderNode> {
   const now = Date.now();
   const node = {
