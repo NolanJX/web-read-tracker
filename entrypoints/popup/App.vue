@@ -110,8 +110,8 @@ async function handlerConfirm() {
     </div>
     <!-- Action Bar -->
     <div class="flex justify-end">
-      <button @click="handlerCancel" class="rounded">Cancel</button>
-      <button @click="handlerConfirm" class="rounded">Confirm</button>
+      <button @click="handlerCancel" class="rounded border">Cancel</button>
+      <button @click="handlerConfirm" class="rounded border">Confirm</button>
     </div>
   </div>
 </template>
