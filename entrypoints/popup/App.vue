@@ -13,6 +13,14 @@ import {
   findWebPage,
   saveWebPage,
 } from "@/utils/web-page";
+import {
+  type Node,
+  ROOT_ID,
+  findWebPageNodesByUrl,
+  findAllNodes,
+  saveWebPageNode,
+  saveNode,
+} from "@/utils/node";
 
 let tab: Browser.tabs.Tab | undefined;
 const isReadLayout = ref(false);
@@ -33,6 +41,9 @@ const displayReadCount = computed(() => {
   }
   return `${readCount.value}`;
 });
+
+// nodes
+const nodes = ref<Node[]>([]);
 
 onMounted(async () => {
   await loadCurTab();
@@ -59,6 +70,8 @@ onMounted(async () => {
       if (existingWebPage.status === "read") {
         isReadLayout.value = true;
       }
+
+      nodes.value = await findWebPageNodesByUrl(url);
     }
   }
 });
@@ -96,6 +109,23 @@ async function handlerConfirm() {
     status: status.value,
     readCount: readCount.value,
   });
+
+  if (nodes.value.length === 0) {
+    const existingNodes = await findAllNodes();
+    const rootChildren = existingNodes.filter((n) => n.parentId === ROOT_ID);
+
+    const node = await saveWebPageNode({
+      name: title,
+      parentId: ROOT_ID,
+      order: rootChildren.length,
+      webPageUrl: url,
+    });
+    nodes.value.push(node);
+  }
+
+  for (const node of nodes.value) {
+    await saveNode(node);
+  }
 
   window.close();
 }

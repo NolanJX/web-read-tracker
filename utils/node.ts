@@ -24,11 +24,11 @@ export async function findAllNodes(): Promise<Node[]> {
   return await nodes.getValue();
 }
 
-export async function findWebPageNodeByUrl(
+export async function findWebPageNodesByUrl(
   webPageUrl: string,
-): Promise<WebPageNode | undefined> {
+): Promise<WebPageNode[]> {
   const existing = await findAllNodes();
-  return existing.find(
+  return existing.filter(
     (n) => n.type === "WebPage" && n.webPageUrl === webPageUrl,
   );
 }
@@ -49,7 +49,7 @@ export async function createRootNode(): Promise<FolderNode> {
   return node;
 }
 
-async function saveNode(
+export async function saveNode(
   node: Partial<Node> & Pick<Node, "name" | "parentId" | "order" | "type">,
 ): Promise<Node> {
   const existing = await nodes.getValue();
