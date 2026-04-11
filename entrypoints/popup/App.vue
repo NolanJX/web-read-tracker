@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted, toRaw } from "vue";
+import { ref, onMounted, toRaw, computed } from "vue";
 import { type Browser, browser } from "wxt/browser";
 import {
   type Favicon,
@@ -15,6 +15,7 @@ import {
 } from "@/utils/web-page";
 
 let tab: Browser.tabs.Tab | undefined;
+const isReadLayout = ref(false);
 
 // favicon
 const favicon = ref<Favicon>({ src: "", data: "" });
@@ -23,6 +24,15 @@ const favicon = ref<Favicon>({ src: "", data: "" });
 let url = "";
 let title = "";
 const status = ref<Status>("read");
+const readCount = ref(0);
+
+const hasIncrementedReadCount = ref(false);
+const displayReadCount = computed(() => {
+  if (hasIncrementedReadCount.value) {
+    return `${readCount.value - 1} + 1`;
+  }
+  return `${readCount.value}`;
+});
 
 onMounted(async () => {
   await loadCurTab();
@@ -44,6 +54,11 @@ onMounted(async () => {
 
     if (existingWebPage) {
       status.value = existingWebPage.status;
+      readCount.value = existingWebPage.readCount;
+
+      if (existingWebPage.status === "read") {
+        isReadLayout.value = true;
+      }
     }
   }
 });
@@ -71,47 +86,93 @@ async function handlerConfirm() {
     await saveFavicon(domain, toRaw(favicon.value));
   }
 
+  if (status.value === "read" && readCount.value === 0) {
+    readCount.value = 1;
+  }
+
   await saveWebPage({
     url: url,
     title: title,
     status: status.value,
-    readCount: status.value === "read" ? 1 : 0,
+    readCount: readCount.value,
   });
 
   window.close();
+}
+
+function handlerIncrReadCount() {
+  ++readCount.value;
+  hasIncrementedReadCount.value = true;
 }
 </script>
 
 <template>
   <div class="flex flex-col">
-    <!-- Main Panel -->
-    <div class="flex">
-      <!-- Left Icon Section -->
-      <div class="flex-center rounded">
-        <img v-if="favicon.data" :src="favicon.data" alt="" />
-        <span v-else>📄</span>
-      </div>
-      <!-- Right Form Section -->
-      <div class="flex flex-1 flex-col">
-        <div class="flex items-center">
-          <label class="text-sm" for="title">Title</label>
-          <input :value="title" id="title" class="flex-1 rounded" readonly />
+    <!-- Read Status Layout -->
+    <template v-if="isReadLayout">
+      <!-- Main Panel -->
+      <div class="flex">
+        <!-- Left Icon Section -->
+        <div class="flex-center rounded">
+          <img v-if="favicon.data" :src="favicon.data" alt="" />
+          <span v-else>📄</span>
         </div>
-        <div class="flex items-center">
-          <span class="text-sm">Status</span>
-          <div class="flex justify-evenly">
-            <label v-for="item in STATUSES" :key="item">
-              <input v-model="status" :value="item" type="radio" />
-              {{ item }}
-            </label>
+        <!-- Right Form Section -->
+        <div class="flex flex-1 flex-col">
+          <div class="flex items-center">
+            <label class="text-sm" for="title">Title</label>
+            <input :value="title" id="title" class="flex-1 rounded" readonly />
+          </div>
+          <span class="text-sm">
+            Read {{ displayReadCount }} times in total
+          </span>
+        </div>
+      </div>
+      <!-- Action Bar -->
+      <div class="flex justify-end">
+        <button
+          @click="handlerIncrReadCount"
+          :disabled="hasIncrementedReadCount"
+          class="rounded border disabled:opacity-50"
+        >
+          +1
+        </button>
+        <button @click="handlerCancel" class="rounded border">Cancel</button>
+        <button @click="handlerConfirm" class="rounded border">Confirm</button>
+      </div>
+    </template>
+
+    <!-- Non-read Status Layout -->
+    <template v-else>
+      <!-- Main Panel -->
+      <div class="flex">
+        <!-- Left Icon Section -->
+        <div class="flex-center rounded">
+          <img v-if="favicon.data" :src="favicon.data" alt="" />
+          <span v-else>📄</span>
+        </div>
+        <!-- Right Form Section -->
+        <div class="flex flex-1 flex-col">
+          <div class="flex items-center">
+            <label class="text-sm" for="title">Title</label>
+            <input :value="title" id="title" class="flex-1 rounded" readonly />
+          </div>
+          <div class="flex items-center">
+            <span class="text-sm">Status</span>
+            <div class="flex justify-evenly">
+              <label v-for="item in STATUSES" :key="item">
+                <input v-model="status" :value="item" type="radio" />
+                {{ item }}
+              </label>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Action Bar -->
-    <div class="flex justify-end">
-      <button @click="handlerCancel" class="rounded border">Cancel</button>
-      <button @click="handlerConfirm" class="rounded border">Confirm</button>
-    </div>
+      <!-- Action Bar -->
+      <div class="flex justify-end">
+        <button @click="handlerCancel" class="rounded border">Cancel</button>
+        <button @click="handlerConfirm" class="rounded border">Confirm</button>
+      </div>
+    </template>
   </div>
 </template>
