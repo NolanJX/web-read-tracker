@@ -95,7 +95,7 @@ async function handlerConfirm() {
       <div class="flex flex-1 flex-col">
         <div class="flex items-center">
           <label class="text-sm" for="title">Title</label>
-          <input :value="title" class="flex-1 rounded" readonly />
+          <input :value="title" id="title" class="flex-1 rounded" readonly />
         </div>
         <div class="flex items-center">
           <span class="text-sm">Status</span>
