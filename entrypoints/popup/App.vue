@@ -14,12 +14,10 @@ import {
   saveWebPage,
 } from "@/utils/web-page";
 import {
-  type Node,
   ROOT_ID,
-  findWebPageNodesByUrl,
+  existsWebPageNodeByUrl,
   findAllNodes,
   saveWebPageNode,
-  saveNode,
 } from "@/utils/node";
 
 let tab!: Browser.tabs.Tab;
@@ -42,8 +40,7 @@ const displayReadCount = computed(() => {
   return `${readCount.value}`;
 });
 
-// nodes
-const nodes = ref<Node[]>([]);
+let linkedNodeExists = false;
 
 onMounted(async () => {
   await loadCurTab();
@@ -70,7 +67,7 @@ onMounted(async () => {
       isReadLayout.value = true;
     }
 
-    nodes.value = await findWebPageNodesByUrl(url);
+    linkedNodeExists = await existsWebPageNodeByUrl(url);
   }
 });
 
@@ -108,21 +105,16 @@ async function handlerConfirm() {
     readCount: readCount.value,
   });
 
-  if (nodes.value.length === 0) {
-    const existingNodes = await findAllNodes();
-    const rootChildren = existingNodes.filter((n) => n.parentId === ROOT_ID);
+  if (!linkedNodeExists) {
+    const nodes = await findAllNodes();
+    const rootChildren = nodes.filter((n) => n.parentId === ROOT_ID);
 
-    const node = await saveWebPageNode({
+    await saveWebPageNode({
       name: title,
       parentId: ROOT_ID,
       order: rootChildren.length,
       webPageUrl: url,
     });
-    nodes.value.push(node);
-  }
-
-  for (const node of nodes.value) {
-    await saveNode(node);
   }
 
   window.close();

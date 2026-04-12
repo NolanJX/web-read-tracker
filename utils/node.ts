@@ -33,6 +33,15 @@ export async function findWebPageNodesByUrl(
   );
 }
 
+export async function existsWebPageNodeByUrl(
+  webPageUrl: string,
+): Promise<boolean> {
+  const existing = await findAllNodes();
+  return existing.some(
+    (n) => n.type === "WebPage" && n.webPageUrl === webPageUrl,
+  );
+}
+
 export async function createRootNode(): Promise<FolderNode> {
   const now = Date.now();
   const node = {
@@ -49,7 +58,7 @@ export async function createRootNode(): Promise<FolderNode> {
   return node;
 }
 
-export async function saveNode(
+async function saveNode(
   node: Partial<Node> & Pick<Node, "name" | "parentId" | "order" | "type">,
 ): Promise<Node> {
   const existing = await nodes.getValue();
