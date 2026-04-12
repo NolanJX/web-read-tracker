@@ -134,6 +134,17 @@ function handlerIncrReadCount() {
 }
 
 async function handlerShowMore() {
+  await browser.tabs.sendMessage(tab.id!, {
+    favicon: toRaw(favicon.value),
+    webPage: {
+      url: url,
+      title: title,
+      status: status.value,
+      readCount: readCount.value,
+      hasIncrementedReadCount: hasIncrementedReadCount.value,
+    },
+  });
+
   window.close();
 }
 </script>
