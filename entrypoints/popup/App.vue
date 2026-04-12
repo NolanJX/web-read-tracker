@@ -134,6 +134,10 @@ function handlerIncrReadCount() {
   ++readCount.value;
   hasIncrementedReadCount.value = true;
 }
+
+async function handlerShowMore() {
+  window.close();
+}
 </script>
 
 <template>
@@ -170,6 +174,12 @@ function handlerIncrReadCount() {
         <button @click="handlerCancel" class="rounded border">Cancel</button>
         <button @click="handlerConfirm" class="rounded border">Confirm</button>
       </div>
+      <!-- Navigation Bar -->
+      <div class="flex">
+        <button @click="handlerShowMore" class="w-full rounded border">
+          More
+        </button>
+      </div>
     </template>
 
     <!-- Non-read Status Layout -->
@@ -202,6 +212,12 @@ function handlerIncrReadCount() {
       <div class="flex justify-end">
         <button @click="handlerCancel" class="rounded border">Cancel</button>
         <button @click="handlerConfirm" class="rounded border">Confirm</button>
+      </div>
+      <!-- Navigation Bar -->
+      <div class="flex">
+        <button @click="handlerShowMore" class="w-full rounded border">
+          More
+        </button>
       </div>
     </template>
   </div>
