@@ -22,7 +22,7 @@ import {
   saveNode,
 } from "@/utils/node";
 
-let tab: Browser.tabs.Tab | undefined;
+let tab!: Browser.tabs.Tab;
 const isReadLayout = ref(false);
 
 // favicon
@@ -48,31 +48,29 @@ const nodes = ref<Node[]>([]);
 onMounted(async () => {
   await loadCurTab();
 
-  if (tab) {
-    url = cleanUrl(tab.url!);
-    title = tab.title!;
+  url = cleanUrl(tab.url!);
+  title = tab.title!;
 
-    const domain = resolveDomain(url);
-    const existingFavicon = await findFavicon(domain);
+  const domain = resolveDomain(url);
+  const existingFavicon = await findFavicon(domain);
 
-    if (existingFavicon !== undefined) {
-      favicon.value = existingFavicon;
-    } else {
-      favicon.value = await fetchFavicon(tab.favIconUrl!);
+  if (existingFavicon !== undefined) {
+    favicon.value = existingFavicon;
+  } else {
+    favicon.value = await fetchFavicon(tab.favIconUrl!);
+  }
+
+  const existingWebPage = await findWebPage(url);
+
+  if (existingWebPage) {
+    status.value = existingWebPage.status;
+    readCount.value = existingWebPage.readCount;
+
+    if (existingWebPage.status === "read") {
+      isReadLayout.value = true;
     }
 
-    const existingWebPage = await findWebPage(url);
-
-    if (existingWebPage) {
-      status.value = existingWebPage.status;
-      readCount.value = existingWebPage.readCount;
-
-      if (existingWebPage.status === "read") {
-        isReadLayout.value = true;
-      }
-
-      nodes.value = await findWebPageNodesByUrl(url);
-    }
+    nodes.value = await findWebPageNodesByUrl(url);
   }
 });
 
