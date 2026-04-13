@@ -110,3 +110,37 @@ export async function saveWebPageNode(
 ): Promise<WebPageNode> {
   return (await saveNode({ ...node, type: "WebPage" })) as WebPageNode;
 }
+
+export interface NodeTree {
+  root: Node;
+  subtrees: NodeTree[];
+}
+
+export function buildNodeTree(root: Node, nodes: Node[]): NodeTree {
+  const children = nodes
+    .filter((n) => n.parentId === root.id)
+    .sort((a, b) => a.order - b.order);
+  const subtrees = children.map((n) => buildNodeTree(n, nodes));
+
+  return { root, subtrees };
+}
+
+export interface FlatTreeNode {
+  node: Node;
+  depth: number;
+}
+
+export function flattenNodeTree(
+  nodeTree: NodeTree,
+  rootDepth: number = 0,
+): FlatTreeNode[] {
+  const flatTreeNodes: FlatTreeNode[] = [
+    { node: nodeTree.root, depth: rootDepth },
+  ];
+
+  for (const subtree of nodeTree.subtrees) {
+    flatTreeNodes.push(...flattenNodeTree(subtree, rootDepth + 1));
+  }
+
+  return flatTreeNodes;
+}
