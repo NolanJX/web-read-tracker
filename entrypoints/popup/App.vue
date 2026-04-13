@@ -127,6 +127,7 @@ function handlerIncrReadCount() {
 
 async function handlerShowMore() {
   await browser.tabs.sendMessage(tab.id!, {
+    isReadLayout: isReadLayout.value,
     favicon: toRaw(favicon.value),
     webPage: {
       url: url,

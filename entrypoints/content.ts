@@ -4,6 +4,7 @@ import { type Status } from "@/utils/web-page";
 import App from "@/components/WebPageEditor.vue";
 
 interface PopupMessage {
+  isReadLayout: boolean;
   favicon: Favicon;
   webPage: {
     url: string;
@@ -27,6 +28,7 @@ export default defineContentScript({
       zIndex: 2 ** 31 - 1,
       onMount: (container) => {
         const app = createApp(App, {
+          initialIsReadLayout: popupMessage.isReadLayout,
           initialFavicon: popupMessage.favicon,
           url: popupMessage.webPage.url,
           title: popupMessage.webPage.title,
@@ -34,6 +36,7 @@ export default defineContentScript({
           initialReadCount: popupMessage.webPage.readCount,
           initialHasIncrementedReadCount:
             popupMessage.webPage.hasIncrementedReadCount,
+          onClose: () => ui.remove(),
         });
         app.mount(container);
         return app;
