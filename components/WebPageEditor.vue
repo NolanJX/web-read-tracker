@@ -67,10 +67,40 @@ watchEffect(() => {
 onMounted(async () => {
   nodes.value = await findAllNodes();
   root.value = nodes.value.find((n) => n.id === ROOT_ID)!;
+
+  if (!existsLinkedNode(nodes.value)) {
+    const parentId = ROOT_ID;
+    const rootChildren = nodes.value.filter((n) => n.parentId === parentId);
+
+    const id = crypto.randomUUID();
+    const now = Date.now();
+
+    nodes.value.push({
+      id,
+      name: props.title,
+      parentId: parentId,
+      order: rootChildren.length,
+      createdAt: now,
+      updatedAt: now,
+      type: "WebPage",
+      webPageUrl: props.url,
+    });
+
+    nodeIconMap.set(
+      id,
+      favicon.value.data
+        ? { type: "img", data: favicon.value.data }
+        : { type: "text", data: "📄" },
+    );
+  }
 });
 
 function resolveDomain(url: string) {
   return new URL(url).hostname;
+}
+
+function existsLinkedNode(nodes: Node[]) {
+  return nodes.some((n) => n.type === "WebPage" && n.webPageUrl === props.url);
 }
 
 function handleCancel() {
@@ -78,6 +108,12 @@ function handleCancel() {
 }
 
 async function handleConfirm() {
+  if (!existsLinkedNode(nodes.value)) {
+    showMissingLinkedNodeTip.value = true;
+    setTimeout(() => (showMissingLinkedNodeTip.value = false), 5000);
+    return;
+  }
+
   if (favicon.value.data) {
     const domain = resolveDomain(props.url);
     await saveFavicon(domain, toRaw(favicon.value));
@@ -132,25 +168,36 @@ function handleCreateVirtualNode() {
   };
 
   let node!: Node;
+  let nodeIcon!: NodeIcon;
 
   switch (newNode.value.type) {
     case "Folder":
       node = { ...base, type: "Folder" };
+      nodeIcon = { type: "text", data: "📁" };
       break;
     case "Domain":
       node = { ...base, type: "Domain", domain: resolveDomain(props.url) };
+      nodeIcon = favicon.value.data
+        ? { type: "img", data: favicon.value.data }
+        : { type: "text", data: "🌐" };
       break;
     case "WebPage":
       node = { ...base, type: "WebPage", webPageUrl: props.url };
+      nodeIcon = favicon.value.data
+        ? { type: "img", data: favicon.value.data }
+        : { type: "text", data: "📄" };
       break;
   }
 
   nodes.value.push(node);
+  nodeIconMap.set(node.id, nodeIcon);
+
   showCreateDialog.value = false;
 }
 
 // UI
 const showCreateDialog = ref(false);
+const showMissingLinkedNodeTip = ref(false);
 const newNode = ref<Pick<Node, "name" | "parentId" | "type">>({
   name: "",
   parentId: ROOT_ID,
@@ -295,7 +342,10 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
       </div>
 
       <!-- Action Bar -->
-      <div class="flex justify-end">
+      <div class="flex items-center justify-end">
+        <span v-if="showMissingLinkedNodeTip" class="text-red text-sm">
+          At least one linked node required
+        </span>
         <button @click="handleCancel" class="rounded border">Cancel</button>
         <button @click="handleConfirm" class="rounded border">Confirm</button>
       </div>
