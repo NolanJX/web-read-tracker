@@ -44,6 +44,7 @@ const displayReadCount = computed(() => {
 // nodes
 const root = ref<Node | undefined>();
 const nodes = ref<Node[]>([]);
+const newNodeIds = reactive(new Set<string>());
 
 const flatTreeNodes = computed<FlatTreeNode[]>(() => {
   if (root.value === undefined) return [];
@@ -85,6 +86,7 @@ onMounted(async () => {
       type: "WebPage",
       webPageUrl: props.url,
     });
+    newNodeIds.add(id);
 
     nodeIconMap.set(
       id,
@@ -190,6 +192,7 @@ function handleCreateVirtualNode() {
   }
 
   nodes.value.push(node);
+  newNodeIds.add(node.id);
   nodeIconMap.set(node.id, nodeIcon);
 
   showCreateDialog.value = false;
@@ -323,6 +326,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
           :key="item.node.id"
           :style="{ marginLeft: `${item.depth}rem` }"
           class="flex justify-between"
+          :class="{ 'bg-gray': newNodeIds.has(item.node.id) }"
         >
           <div class="flex items-center">
             <img
