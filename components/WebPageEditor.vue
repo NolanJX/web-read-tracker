@@ -73,11 +73,11 @@ function resolveDomain(url: string) {
   return new URL(url).hostname;
 }
 
-function handlerCancel() {
+function handleCancel() {
   props.onClose();
 }
 
-async function handlerConfirm() {
+async function handleConfirm() {
   if (favicon.value.data) {
     const domain = resolveDomain(props.url);
     await saveFavicon(domain, toRaw(favicon.value));
@@ -101,12 +101,12 @@ async function handlerConfirm() {
   props.onClose();
 }
 
-function handlerIncrReadCount() {
+function handleIncrReadCount() {
   ++readCount.value;
   hasIncrementedReadCount.value = true;
 }
 
-function handlerCreateChildNode(nodeId: string) {
+function handleCreateChildNode(nodeId: string) {
   newNode.value.name = props.title;
   newNode.value.parentId = nodeId;
   newNode.value.type = "WebPage";
@@ -114,7 +114,7 @@ function handlerCreateChildNode(nodeId: string) {
   showCreateDialog.value = true;
 }
 
-function handlerCreateVirtualNode() {
+function handleCreateVirtualNode() {
   const siblingNodes = nodes.value.filter(
     (n) => n.parentId === newNode.value.parentId,
   );
@@ -200,7 +200,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
       <!-- Title Bar -->
       <div class="flex items-center justify-between border-b">
         <span class="text-sm">Web Page Editor</span>
-        <button @click="handlerCancel" class="text-sm">&times;</button>
+        <button @click="handleCancel" class="text-sm">&times;</button>
       </div>
 
       <!-- Web Page Panel -->
@@ -228,7 +228,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
                 Read {{ displayReadCount }} times in total
               </span>
               <button
-                @click="handlerIncrReadCount"
+                @click="handleIncrReadCount"
                 :disabled="hasIncrementedReadCount"
                 class="rounded border disabled:opacity-50"
               >
@@ -288,9 +288,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
             <span class="text-sm">{{ item.node.name }}</span>
           </div>
           <div class="flex">
-            <button @click.stop="handlerCreateChildNode(item.node.id)">
-              +
-            </button>
+            <button @click.stop="handleCreateChildNode(item.node.id)">+</button>
             <button>&times;</button>
           </div>
         </div>
@@ -298,8 +296,8 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
 
       <!-- Action Bar -->
       <div class="flex justify-end">
-        <button @click="handlerCancel" class="rounded border">Cancel</button>
-        <button @click="handlerConfirm" class="rounded border">Confirm</button>
+        <button @click="handleCancel" class="rounded border">Cancel</button>
+        <button @click="handleConfirm" class="rounded border">Confirm</button>
       </div>
 
       <!-- New Node Dialog -->
@@ -322,7 +320,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
           <div class="flex justify-end">
             <button @click="showCreateDialog = false">Cancel</button>
             <button
-              @click="handlerCreateVirtualNode"
+              @click="handleCreateVirtualNode"
               :disabled="!newNode.name.trim()"
             >
               OK

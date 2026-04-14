@@ -84,11 +84,11 @@ function resolveDomain(url: string) {
   return new URL(url).hostname;
 }
 
-function handlerCancel() {
+function handleCancel() {
   window.close();
 }
 
-async function handlerConfirm() {
+async function handleConfirm() {
   if (favicon.value.data) {
     const domain = resolveDomain(url);
     await saveFavicon(domain, toRaw(favicon.value));
@@ -120,12 +120,12 @@ async function handlerConfirm() {
   window.close();
 }
 
-function handlerIncrReadCount() {
+function handleIncrReadCount() {
   ++readCount.value;
   hasIncrementedReadCount.value = true;
 }
 
-async function handlerShowMore() {
+async function handleShowMore() {
   await browser.tabs.sendMessage(tab.id!, {
     isReadLayout: isReadLayout.value,
     favicon: toRaw(favicon.value),
@@ -167,18 +167,18 @@ async function handlerShowMore() {
       <!-- Action Bar -->
       <div class="flex justify-end">
         <button
-          @click="handlerIncrReadCount"
+          @click="handleIncrReadCount"
           :disabled="hasIncrementedReadCount"
           class="rounded border disabled:opacity-50"
         >
           +1
         </button>
-        <button @click="handlerCancel" class="rounded border">Cancel</button>
-        <button @click="handlerConfirm" class="rounded border">Confirm</button>
+        <button @click="handleCancel" class="rounded border">Cancel</button>
+        <button @click="handleConfirm" class="rounded border">Confirm</button>
       </div>
       <!-- Navigation Bar -->
       <div class="flex">
-        <button @click="handlerShowMore" class="w-full rounded border">
+        <button @click="handleShowMore" class="w-full rounded border">
           More
         </button>
       </div>
@@ -212,12 +212,12 @@ async function handlerShowMore() {
       </div>
       <!-- Action Bar -->
       <div class="flex justify-end">
-        <button @click="handlerCancel" class="rounded border">Cancel</button>
-        <button @click="handlerConfirm" class="rounded border">Confirm</button>
+        <button @click="handleCancel" class="rounded border">Cancel</button>
+        <button @click="handleConfirm" class="rounded border">Confirm</button>
       </div>
       <!-- Navigation Bar -->
       <div class="flex">
-        <button @click="handlerShowMore" class="w-full rounded border">
+        <button @click="handleShowMore" class="w-full rounded border">
           More
         </button>
       </div>
