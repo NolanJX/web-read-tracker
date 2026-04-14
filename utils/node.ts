@@ -58,7 +58,7 @@ export async function createRootNode(): Promise<FolderNode> {
   return node;
 }
 
-async function saveNode(
+export async function saveNode(
   node: Partial<Node> & Pick<Node, "name" | "parentId" | "order" | "type">,
 ): Promise<Node> {
   const existing = await nodes.getValue();

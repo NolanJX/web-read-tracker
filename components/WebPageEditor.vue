@@ -10,6 +10,7 @@ import {
   buildNodeTree,
   flattenNodeTree,
   findAllNodes,
+  saveNode,
 } from "@/utils/node";
 
 const props = defineProps<{
@@ -93,6 +94,10 @@ async function handlerConfirm() {
     readCount: readCount.value,
   });
 
+  for (const node of nodes.value) {
+    await saveNode(node);
+  }
+
   props.onClose();
 }
 
@@ -101,7 +106,57 @@ function handlerIncrReadCount() {
   hasIncrementedReadCount.value = true;
 }
 
+function handlerCreateChildNode(nodeId: string) {
+  newNode.value.name = props.title;
+  newNode.value.parentId = nodeId;
+  newNode.value.type = "WebPage";
+
+  showCreateDialog.value = true;
+}
+
+function handlerCreateVirtualNode() {
+  const siblingNodes = nodes.value.filter(
+    (n) => n.parentId === newNode.value.parentId,
+  );
+  const order = siblingNodes.length;
+
+  const now = Date.now();
+  const base = {
+    id: crypto.randomUUID(),
+    name: newNode.value.name,
+    parentId: newNode.value.parentId,
+    order: order,
+    createdAt: now,
+    updatedAt: now,
+    type: newNode.value.type,
+  };
+
+  let node!: Node;
+
+  switch (newNode.value.type) {
+    case "Folder":
+      node = { ...base, type: "Folder" };
+      break;
+    case "Domain":
+      node = { ...base, type: "Domain", domain: resolveDomain(props.url) };
+      break;
+    case "WebPage":
+      node = { ...base, type: "WebPage", webPageUrl: props.url };
+      break;
+  }
+
+  nodes.value.push(node);
+  showCreateDialog.value = false;
+}
+
 // UI
+const showCreateDialog = ref(false);
+const newNode = ref<Pick<Node, "name" | "parentId" | "type">>({
+  name: "",
+  parentId: ROOT_ID,
+  type: "WebPage",
+});
+
 async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
   const nodeIcon = { type: "text", data: "" };
 
@@ -233,7 +288,9 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
             <span class="text-sm">{{ item.node.name }}</span>
           </div>
           <div class="flex">
-            <button>+</button>
+            <button @click.stop="handlerCreateChildNode(item.node.id)">
+              +
+            </button>
             <button>&times;</button>
           </div>
         </div>
@@ -243,6 +300,35 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
       <div class="flex justify-end">
         <button @click="handlerCancel" class="rounded border">Cancel</button>
         <button @click="handlerConfirm" class="rounded border">Confirm</button>
+      </div>
+
+      <!-- New Node Dialog -->
+      <div v-if="showCreateDialog" class="flex-center fixed inset-0 z-1">
+        <div class="flex flex-col rounded border bg-white">
+          <div class="flex items-center justify-between border-b">
+            <span class="text-sm">New Node</span>
+            <button @click="showCreateDialog = false" class="text-sm">
+              &times;
+            </button>
+          </div>
+          <div class="flex items-center text-sm">
+            <select v-model="newNode.type">
+              <option value="Folder">Folder</option>
+              <option value="Domain">Domain</option>
+              <option value="WebPage">WebPage</option>
+            </select>
+            <input v-model="newNode.name" class="flex-1 rounded border" />
+          </div>
+          <div class="flex justify-end">
+            <button @click="showCreateDialog = false">Cancel</button>
+            <button
+              @click="handlerCreateVirtualNode"
+              :disabled="!newNode.name.trim()"
+            >
+              OK
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
