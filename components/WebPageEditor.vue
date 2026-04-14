@@ -196,7 +196,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
 
 <template>
   <div class="flex-center fixed inset-0">
-    <div class="flex-col rounded border bg-white">
+    <div class="flex flex-col rounded border bg-white">
       <!-- Title Bar -->
       <div class="flex items-center justify-between border-b">
         <span class="text-sm">Web Page Editor</span>
