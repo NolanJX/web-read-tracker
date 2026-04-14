@@ -105,6 +105,14 @@ function existsLinkedNode(nodes: Node[]) {
   return nodes.some((n) => n.type === "WebPage" && n.webPageUrl === props.url);
 }
 
+function findAllDescendantNodeIds(nodeId: string): string[] {
+  const children = nodes.value.filter((n) => n.parentId === nodeId);
+  return children.flatMap((child) => [
+    child.id,
+    ...findAllDescendantNodeIds(child.id),
+  ]);
+}
+
 function handleCancel() {
   props.onClose();
 }
@@ -150,6 +158,15 @@ function handleCreateChildNode(nodeId: string) {
   newNode.value.type = "WebPage";
 
   showCreateDialog.value = true;
+}
+
+function handleDeleteNode(nodeId: string) {
+  const idsToDelete = [nodeId, ...findAllDescendantNodeIds(nodeId)];
+  nodes.value = nodes.value.filter((n) => !idsToDelete.includes(n.id));
+  for (const id of idsToDelete) {
+    newNodeIds.delete(id);
+    nodeIconMap.delete(id);
+  }
 }
 
 function handleCreateVirtualNode() {
@@ -340,7 +357,12 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
           </div>
           <div class="flex">
             <button @click="handleCreateChildNode(item.node.id)">+</button>
-            <button>&times;</button>
+            <button
+              v-if="newNodeIds.has(item.node.id)"
+              @click="handleDeleteNode(item.node.id)"
+            >
+              &times;
+            </button>
           </div>
         </div>
       </div>
