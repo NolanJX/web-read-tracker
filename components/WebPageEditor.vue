@@ -335,7 +335,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
             <span class="text-sm">{{ item.node.name }}</span>
           </div>
           <div class="flex">
-            <button @click.stop="handleCreateChildNode(item.node.id)">+</button>
+            <button @click="handleCreateChildNode(item.node.id)">+</button>
             <button>&times;</button>
           </div>
         </div>
