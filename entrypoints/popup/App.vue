@@ -140,6 +140,11 @@ async function handleShowMore() {
 
   window.close();
 }
+
+function handleViewList() {
+  window.open(browser.runtime.getURL("/list.html"));
+  window.close();
+}
 </script>
 
 <template>
@@ -178,7 +183,10 @@ async function handleShowMore() {
       </div>
       <!-- Navigation Bar -->
       <div class="flex">
-        <button @click="handleShowMore" class="w-full rounded border">
+        <button @click="handleViewList" class="flex-1 rounded border">
+          View List
+        </button>
+        <button @click="handleShowMore" class="flex-1 rounded border">
           More
         </button>
       </div>
@@ -217,7 +225,10 @@ async function handleShowMore() {
       </div>
       <!-- Navigation Bar -->
       <div class="flex">
-        <button @click="handleShowMore" class="w-full rounded border">
+        <button @click="handleViewList" class="flex-1 rounded border">
+          View List
+        </button>
+        <button @click="handleShowMore" class="flex-1 rounded border">
           More
         </button>
       </div>
