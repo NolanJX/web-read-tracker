@@ -154,9 +154,16 @@ function handleViewList() {
       <!-- Main Panel -->
       <div class="flex">
         <!-- Left Icon Section -->
-        <div class="flex-center h-16 w-16 rounded">
-          <img v-if="favicon.data" :src="favicon.data" alt="" />
-          <span v-else>📄</span>
+        <div
+          class="flex-center outline-blue h-16 w-16 shrink-0 rounded outline-2"
+        >
+          <img
+            v-if="favicon.data"
+            :src="favicon.data"
+            alt=""
+            class="h-full w-full object-contain"
+          />
+          <span v-else class="text-4xl">📄</span>
         </div>
         <!-- Right Form Section -->
         <div class="flex flex-1 flex-col">
@@ -197,9 +204,16 @@ function handleViewList() {
       <!-- Main Panel -->
       <div class="flex">
         <!-- Left Icon Section -->
-        <div class="flex-center h-16 w-16 rounded">
-          <img v-if="favicon.data" :src="favicon.data" alt="" />
-          <span v-else>📄</span>
+        <div
+          class="flex-center outline-blue h-16 w-16 shrink-0 rounded outline-2"
+        >
+          <img
+            v-if="favicon.data"
+            :src="favicon.data"
+            alt=""
+            class="h-full w-full object-contain"
+          />
+          <span v-else class="text-4xl">📄</span>
         </div>
         <!-- Right Form Section -->
         <div class="flex flex-1 flex-col">
