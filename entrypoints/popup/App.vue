@@ -154,7 +154,7 @@ function handleViewList() {
       <!-- Main Panel -->
       <div class="flex">
         <!-- Left Icon Section -->
-        <div class="flex-center rounded">
+        <div class="flex-center h-16 w-16 rounded">
           <img v-if="favicon.data" :src="favicon.data" alt="" />
           <span v-else>📄</span>
         </div>
@@ -197,7 +197,7 @@ function handleViewList() {
       <!-- Main Panel -->
       <div class="flex">
         <!-- Left Icon Section -->
-        <div class="flex-center rounded">
+        <div class="flex-center h-16 w-16 rounded">
           <img v-if="favicon.data" :src="favicon.data" alt="" />
           <span v-else>📄</span>
         </div>
