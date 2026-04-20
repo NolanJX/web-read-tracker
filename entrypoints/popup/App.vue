@@ -149,103 +149,61 @@ function handleViewList() {
 
 <template>
   <div class="flex flex-col">
-    <!-- Read Status Layout -->
-    <template v-if="isReadLayout">
-      <!-- Main Panel -->
-      <div class="flex">
-        <!-- Left Icon Section -->
-        <div
-          class="flex-center outline-blue h-16 w-16 shrink-0 rounded outline-2"
-        >
-          <img
-            v-if="favicon.data"
-            :src="favicon.data"
-            alt=""
-            class="h-full w-full object-contain"
-          />
-          <span v-else class="text-4xl">📄</span>
-        </div>
-        <!-- Right Form Section -->
-        <div class="flex flex-1 flex-col">
-          <div class="flex items-center">
-            <label class="text-sm" for="title">Title</label>
-            <input :value="title" id="title" class="flex-1 rounded" readonly />
-          </div>
-          <span class="text-sm">
-            Read {{ displayReadCount }} times in total
-          </span>
-        </div>
+    <!-- Main Panel -->
+    <div class="flex">
+      <!-- Left Icon Section -->
+      <div
+        class="flex-center outline-blue h-16 w-16 shrink-0 rounded outline-2"
+      >
+        <img
+          v-if="favicon.data"
+          :src="favicon.data"
+          alt=""
+          class="h-full w-full object-contain"
+        />
+        <span v-else class="text-4xl">📄</span>
       </div>
-      <!-- Action Bar -->
-      <div class="flex justify-end">
-        <button
-          @click="handleIncrReadCount"
-          :disabled="hasIncrementedReadCount"
-          class="rounded border disabled:opacity-50"
-        >
-          +1
-        </button>
-        <button @click="handleCancel" class="rounded border">Cancel</button>
-        <button @click="handleConfirm" class="rounded border">Confirm</button>
-      </div>
-      <!-- Navigation Bar -->
-      <div class="flex">
-        <button @click="handleViewList" class="flex-1 rounded border">
-          View List
-        </button>
-        <button @click="handleShowMore" class="flex-1 rounded border">
-          More
-        </button>
-      </div>
-    </template>
-
-    <!-- Non-read Status Layout -->
-    <template v-else>
-      <!-- Main Panel -->
-      <div class="flex">
-        <!-- Left Icon Section -->
-        <div
-          class="flex-center outline-blue h-16 w-16 shrink-0 rounded outline-2"
-        >
-          <img
-            v-if="favicon.data"
-            :src="favicon.data"
-            alt=""
-            class="h-full w-full object-contain"
-          />
-          <span v-else class="text-4xl">📄</span>
+      <!-- Right Form Section -->
+      <div class="flex flex-1 flex-col">
+        <div class="flex items-center">
+          <label class="text-sm" for="title">Title</label>
+          <input :value="title" id="title" class="flex-1 rounded" readonly />
         </div>
-        <!-- Right Form Section -->
-        <div class="flex flex-1 flex-col">
-          <div class="flex items-center">
-            <label class="text-sm" for="title">Title</label>
-            <input :value="title" id="title" class="flex-1 rounded" readonly />
-          </div>
-          <div class="flex items-center">
-            <span class="text-sm">Status</span>
-            <div class="flex justify-evenly">
-              <label v-for="item in STATUSES" :key="item">
-                <input v-model="status" :value="item" type="radio" />
-                {{ item }}
-              </label>
-            </div>
+        <span v-if="isReadLayout" class="text-sm">
+          Read {{ displayReadCount }} times in total
+        </span>
+        <div v-else class="flex items-center">
+          <span class="text-sm">Status</span>
+          <div class="flex justify-evenly">
+            <label v-for="item in STATUSES" :key="item">
+              <input v-model="status" :value="item" type="radio" />
+              {{ item }}
+            </label>
           </div>
         </div>
       </div>
-      <!-- Action Bar -->
-      <div class="flex justify-end">
-        <button @click="handleCancel" class="rounded border">Cancel</button>
-        <button @click="handleConfirm" class="rounded border">Confirm</button>
-      </div>
-      <!-- Navigation Bar -->
-      <div class="flex">
-        <button @click="handleViewList" class="flex-1 rounded border">
-          View List
-        </button>
-        <button @click="handleShowMore" class="flex-1 rounded border">
-          More
-        </button>
-      </div>
-    </template>
+    </div>
+    <!-- Action Bar -->
+    <div class="flex justify-end">
+      <button
+        v-if="isReadLayout"
+        @click="handleIncrReadCount"
+        :disabled="hasIncrementedReadCount"
+        class="rounded border disabled:opacity-50"
+      >
+        +1
+      </button>
+      <button @click="handleCancel" class="rounded border">Cancel</button>
+      <button @click="handleConfirm" class="rounded border">Confirm</button>
+    </div>
+    <!-- Navigation Bar -->
+    <div class="flex">
+      <button @click="handleViewList" class="flex-1 rounded border">
+        View List
+      </button>
+      <button @click="handleShowMore" class="flex-1 rounded border">
+        More
+      </button>
+    </div>
   </div>
 </template>
