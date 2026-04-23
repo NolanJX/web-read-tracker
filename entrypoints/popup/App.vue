@@ -189,30 +189,31 @@ function handleViewList() {
       </div>
     </div>
     <!-- Action Bar -->
-    <div class="flex justify-end gap-x-2">
-      <button
-        v-if="isReadLayout"
-        @click="handleIncrReadCount"
-        :disabled="hasIncrementedReadCount"
-        class="rounded border text-base disabled:opacity-50"
-      >
-        +1
-      </button>
-      <button @click="handleCancel" class="rounded border text-base">
-        Cancel
-      </button>
-      <button @click="handleConfirm" class="rounded border text-base">
-        Confirm
-      </button>
-    </div>
-    <!-- Navigation Bar -->
-    <div class="flex gap-x-4">
-      <button @click="handleViewList" class="flex-1 rounded border text-base">
-        View List
-      </button>
-      <button @click="handleShowMore" class="flex-1 rounded border text-base">
-        More
-      </button>
+    <div class="flex justify-between">
+      <div class="flex gap-x-2">
+        <button @click="handleViewList" class="rounded border text-base">
+          View List
+        </button>
+        <button @click="handleShowMore" class="rounded border text-base">
+          More
+        </button>
+      </div>
+      <div class="flex gap-x-2">
+        <button
+          v-if="isReadLayout"
+          @click="handleIncrReadCount"
+          :disabled="hasIncrementedReadCount"
+          class="rounded border text-base disabled:opacity-50"
+        >
+          +1
+        </button>
+        <button @click="handleCancel" class="rounded border text-base">
+          Cancel
+        </button>
+        <button @click="handleConfirm" class="rounded border text-base">
+          Confirm
+        </button>
+      </div>
     </div>
   </div>
 </template>
