@@ -120,32 +120,37 @@ function title(str: string) {
 </script>
 
 <template>
-  <div class="flex flex-col items-center">
+  <div class="mx-auto w-2/5">
     <!-- Tabs -->
-    <div class="border-b">
+    <div class="flex justify-center gap-x-4 border-b py-3">
       <button
         v-for="item in TABS"
         :key="item"
         :class="{ 'outline-2 outline-offset-2': activeTab === item }"
         @click="activeTab = item"
-        class="rounded border text-sm"
+        class="flex-1 rounded border text-base"
       >
         {{ title(item) }}
       </button>
     </div>
     <!-- List -->
-    <div v-if="isLoading" class="text-sm">Loading...</div>
-    <div v-else-if="filteredNodeTrees.length === 0" class="text-sm">
-      No items yet.
-    </div>
-    <div v-else>
-      <TreeNode
-        v-for="item in filteredNodeTrees"
-        :key="item.root.id"
-        :web-page-map="webPageMap"
-        :node-icon-map="nodeIconMap"
-        :node-tree="item"
-      ></TreeNode>
+    <div class="py-3">
+      <div v-if="isLoading" class="text-center text-base">Loading...</div>
+      <div
+        v-else-if="filteredNodeTrees.length === 0"
+        class="text-center text-base"
+      >
+        No items yet.
+      </div>
+      <div v-else>
+        <TreeNode
+          v-for="item in filteredNodeTrees"
+          :key="item.root.id"
+          :web-page-map="webPageMap"
+          :node-icon-map="nodeIconMap"
+          :node-tree="item"
+        ></TreeNode>
+      </div>
     </div>
   </div>
 </template>
