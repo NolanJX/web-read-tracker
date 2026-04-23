@@ -148,9 +148,9 @@ function handleViewList() {
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div class="m-3 flex flex-col gap-y-4 p-3">
     <!-- Main Panel -->
-    <div class="flex">
+    <div class="flex gap-x-4">
       <!-- Left Icon Section -->
       <div
         class="flex-center outline-blue h-16 w-16 shrink-0 rounded outline-2"
@@ -164,18 +164,23 @@ function handleViewList() {
         <span v-else class="text-4xl">📄</span>
       </div>
       <!-- Right Form Section -->
-      <div class="flex flex-1 flex-col">
-        <div class="flex items-center">
-          <label class="text-sm" for="title">Title</label>
-          <input :value="title" id="title" class="flex-1 rounded" readonly />
+      <div class="flex flex-1 flex-col gap-y-2">
+        <div class="flex items-center gap-x-2">
+          <label class="text-base" for="title">Title</label>
+          <input
+            :value="title"
+            id="title"
+            class="flex-1 rounded text-sm"
+            readonly
+          />
         </div>
-        <span v-if="isReadLayout" class="text-sm">
+        <span v-if="isReadLayout" class="text-base">
           Read {{ displayReadCount }} times in total
         </span>
-        <div v-else class="flex items-center">
-          <span class="text-sm">Status</span>
-          <div class="flex justify-evenly">
-            <label v-for="item in STATUSES" :key="item">
+        <div v-else class="flex items-center gap-x-2">
+          <span class="text-base">Status</span>
+          <div class="flex justify-evenly gap-x-2">
+            <label v-for="item in STATUSES" :key="item" class="text-sm">
               <input v-model="status" :value="item" type="radio" />
               {{ item }}
             </label>
@@ -184,24 +189,28 @@ function handleViewList() {
       </div>
     </div>
     <!-- Action Bar -->
-    <div class="flex justify-end">
+    <div class="flex justify-end gap-x-2">
       <button
         v-if="isReadLayout"
         @click="handleIncrReadCount"
         :disabled="hasIncrementedReadCount"
-        class="rounded border disabled:opacity-50"
+        class="rounded border text-base disabled:opacity-50"
       >
         +1
       </button>
-      <button @click="handleCancel" class="rounded border">Cancel</button>
-      <button @click="handleConfirm" class="rounded border">Confirm</button>
+      <button @click="handleCancel" class="rounded border text-base">
+        Cancel
+      </button>
+      <button @click="handleConfirm" class="rounded border text-base">
+        Confirm
+      </button>
     </div>
     <!-- Navigation Bar -->
-    <div class="flex">
-      <button @click="handleViewList" class="flex-1 rounded border">
+    <div class="flex gap-x-4">
+      <button @click="handleViewList" class="flex-1 rounded border text-base">
         View List
       </button>
-      <button @click="handleShowMore" class="flex-1 rounded border">
+      <button @click="handleShowMore" class="flex-1 rounded border text-base">
         More
       </button>
     </div>
