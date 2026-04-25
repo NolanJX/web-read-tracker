@@ -36,8 +36,8 @@ function getStatusColor(status: Status) {
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <div class="flex items-center text-sm">
+  <div class="flex flex-col gap-y-1">
+    <div class="flex items-center gap-x-1 text-sm">
       <img
         v-if="nodeIcon.type === 'img'"
         :src="nodeIcon.data"
@@ -57,13 +57,17 @@ function getStatusColor(status: Status) {
         {{ `&times;${linkedWebPage.readCount}` }}
       </span>
     </div>
-    <div class="ml-4">
+    <div
+      v-if="props.nodeTree.subtrees.length > 0"
+      class="ml-4 flex flex-col gap-y-1 border-t border-gray-300 pt-1"
+    >
       <TreeNode
         v-for="item in props.nodeTree.subtrees"
         :key="item.root.id"
         :web-page-map="props.webPageMap"
         :node-icon-map="props.nodeIconMap"
         :node-tree="item"
+        class="not-first:border-t not-first:border-gray-300 not-first:pt-1"
       >
       </TreeNode>
     </div>

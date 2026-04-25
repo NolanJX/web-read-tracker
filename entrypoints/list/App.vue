@@ -163,6 +163,7 @@ function getTabColor(tab: Tab) {
           :web-page-map="webPageMap"
           :node-icon-map="nodeIconMap"
           :node-tree="item"
+          class="rounded border p-1 not-first:mt-1"
         ></TreeNode>
       </div>
     </div>
