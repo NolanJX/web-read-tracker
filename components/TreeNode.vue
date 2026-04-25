@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type WebPage } from "@/utils/web-page";
+import { type Status, type WebPage } from "@/utils/web-page";
 import { type NodeTree } from "@/utils/node";
 
 type NodeIcon = { type: "text"; data: string } | { type: "img"; data: string };
@@ -15,6 +15,24 @@ const linkedWebPage =
   props.nodeTree.root.type === "WebPage"
     ? props.webPageMap.get(props.nodeTree.root.webPageUrl)
     : undefined;
+
+function title(str: string) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+// UI
+function getStatusColor(status: Status) {
+  const map: Record<Status, string> = {
+    read: "bg-green-500",
+    reading: "bg-blue-500",
+    unread: "bg-orange-500",
+  };
+  return map[status];
+}
 </script>
 
 <template>
@@ -28,6 +46,13 @@ const linkedWebPage =
       />
       <span v-else>{{ nodeIcon.data }}</span>
       <span class="flex-1">{{ props.nodeTree.root.name }}</span>
+      <span
+        v-if="linkedWebPage !== undefined"
+        :class="getStatusColor(linkedWebPage.status)"
+        class="rounded px-1 text-sm text-white"
+      >
+        {{ title(linkedWebPage.status) }}
+      </span>
       <span v-if="linkedWebPage?.status === 'read'">
         {{ `&times;${linkedWebPage.readCount}` }}
       </span>
