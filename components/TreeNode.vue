@@ -36,7 +36,7 @@ function getStatusColor(status: Status) {
 </script>
 
 <template>
-  <div class="ml-4 flex flex-col">
+  <div class="flex flex-col">
     <div class="flex items-center text-sm">
       <img
         v-if="nodeIcon.type === 'img'"
@@ -57,13 +57,15 @@ function getStatusColor(status: Status) {
         {{ `&times;${linkedWebPage.readCount}` }}
       </span>
     </div>
-    <TreeNode
-      v-for="item in props.nodeTree.subtrees"
-      :key="item.root.id"
-      :web-page-map="props.webPageMap"
-      :node-icon-map="props.nodeIconMap"
-      :node-tree="item"
-    >
-    </TreeNode>
+    <div class="ml-4">
+      <TreeNode
+        v-for="item in props.nodeTree.subtrees"
+        :key="item.root.id"
+        :web-page-map="props.webPageMap"
+        :node-icon-map="props.nodeIconMap"
+        :node-tree="item"
+      >
+      </TreeNode>
+    </div>
   </div>
 </template>
