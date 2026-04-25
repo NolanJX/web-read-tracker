@@ -117,6 +117,17 @@ function title(str: string) {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
+
+// UI
+function getTabColor(tab: Tab) {
+  const map: Record<Tab, string> = {
+    all: "bg-gray-500",
+    read: "bg-green-500",
+    reading: "bg-blue-500",
+    unread: "bg-orange-500",
+  };
+  return map[tab];
+}
 </script>
 
 <template>
@@ -126,9 +137,12 @@ function title(str: string) {
       <button
         v-for="item in TABS"
         :key="item"
-        :class="{ 'outline-2 outline-offset-2': activeTab === item }"
+        :class="[
+          getTabColor(item),
+          { 'outline-2 outline-offset-2 outline-pink-500': activeTab === item },
+        ]"
         @click="activeTab = item"
-        class="flex-1 rounded border text-base"
+        class="flex-1 rounded border text-base text-white"
       >
         {{ title(item) }}
       </button>
