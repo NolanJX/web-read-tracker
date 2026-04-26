@@ -22,6 +22,7 @@ const linkedWebPage =
     : undefined;
 
 const isPendingDeletion = ref(false);
+const isExpanded = ref(true);
 
 async function handleDelete() {
   if (!isPendingDeletion.value) {
@@ -101,6 +102,13 @@ function getStatusColor(status: Status) {
 <template>
   <div class="flex flex-col gap-y-1">
     <div class="flex items-center gap-x-1 text-sm">
+      <button
+        v-if="props.nodeTree.subtrees.length > 0"
+        @click="isExpanded = !isExpanded"
+      >
+        {{ isExpanded ? "🔽" : "▶️" }}
+      </button>
+      <span v-else class="w-4"></span>
       <img
         v-if="nodeIcon.type === 'img'"
         :src="nodeIcon.data"
@@ -129,7 +137,7 @@ function getStatusColor(status: Status) {
       <button v-else @click="handleDelete">❌</button>
     </div>
     <div
-      v-if="props.nodeTree.subtrees.length > 0"
+      v-if="props.nodeTree.subtrees.length > 0 && isExpanded"
       class="ml-4 flex flex-col gap-y-1 border-t border-gray-300 pt-1"
     >
       <TreeNode
