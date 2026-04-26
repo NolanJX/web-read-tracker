@@ -276,7 +276,12 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
         <template v-if="isReadLayout">
           <!-- Left Icon Section -->
           <div class="flex-center rounded">
-            <img v-if="favicon.data" :src="favicon.data" alt="" />
+            <img
+              v-if="favicon.data"
+              :src="favicon.data"
+              alt=""
+              class="h-4 w-4"
+            />
             <span v-else>📄</span>
           </div>
           <!-- Right Form Section -->
@@ -309,7 +314,12 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
         <template v-else>
           <!-- Left Icon Section -->
           <div class="flex-center rounded">
-            <img v-if="favicon.data" :src="favicon.data" alt="" />
+            <img
+              v-if="favicon.data"
+              :src="favicon.data"
+              alt=""
+              class="h-4 w-4"
+            />
             <span v-else>📄</span>
           </div>
           <!-- Right Form Section -->
