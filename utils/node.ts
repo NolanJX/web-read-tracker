@@ -111,6 +111,30 @@ export async function saveWebPageNode(
   return (await saveNode({ ...node, type: "WebPage" })) as WebPageNode;
 }
 
+export async function deleteNodeAndDescendants(
+  id: string,
+): Promise<{ deleted: Node[]; remaining: Node[] }> {
+  const existing = await findAllNodes();
+  const idsToDelete: string[] = [];
+
+  function collectIds(id: string) {
+    idsToDelete.push(id);
+    existing.filter((n) => n.parentId === id).forEach((n) => collectIds(n.id));
+  }
+
+  collectIds(id);
+
+  const deleted: Node[] = [];
+  const remaining: Node[] = [];
+
+  for (const n of existing) {
+    (idsToDelete.includes(n.id) ? deleted : remaining).push(n);
+  }
+
+  await nodes.setValue(remaining);
+  return { deleted, remaining };
+}
+
 export interface NodeTree {
   root: Node;
   subtrees: NodeTree[];

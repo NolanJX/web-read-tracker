@@ -36,6 +36,12 @@ const filteredNodeTrees = computed(() => {
 });
 
 onMounted(async () => {
+  await loadData();
+});
+
+async function loadData() {
+  isLoading.value = true;
+
   const [webPages, nodes] = await Promise.all([
     findAllWebPages(),
     findAllNodes(),
@@ -53,7 +59,7 @@ onMounted(async () => {
   nodeTrees.value = rootTree.subtrees;
 
   isLoading.value = false;
-});
+}
 
 function filterNodeTree(nodeTree: NodeTree, status: Status): NodeTree | null {
   if (nodeTree.root.type === "WebPage") {
@@ -163,6 +169,7 @@ function getTabColor(tab: Tab) {
           :web-page-map="webPageMap"
           :node-icon-map="nodeIconMap"
           :node-tree="item"
+          @deleted="loadData"
           class="rounded border p-1 not-first:mt-1"
         ></TreeNode>
       </div>

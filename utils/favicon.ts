@@ -28,6 +28,25 @@ export async function saveFavicon(
   await domainToFavicon.setValue(map);
 }
 
+export async function deleteFavicons(domains: string[]): Promise<{
+  deleted: Record<Domain, Favicon>;
+  remaining: Record<Domain, Favicon>;
+}> {
+  const deleted: Record<Domain, Favicon> = {};
+  const map = await domainToFavicon.getValue();
+
+  for (const domain of domains) {
+    const favicon = map[domain];
+    if (favicon !== undefined) {
+      deleted[domain] = favicon;
+      delete map[domain];
+    }
+  }
+
+  await domainToFavicon.setValue(map);
+  return { deleted, remaining: map };
+}
+
 export async function fetchFavicon(url: string): Promise<Favicon> {
   const response = await browser.runtime.sendMessage({
     type: "fetchFavicon",

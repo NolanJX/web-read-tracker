@@ -47,3 +47,18 @@ export async function saveWebPage(
   await webPages.setValue(existing);
   return webPage;
 }
+
+export async function deleteWebPages(
+  urls: string[],
+): Promise<{ deleted: WebPage[]; remaining: WebPage[] }> {
+  const deleted: WebPage[] = [];
+  const remaining: WebPage[] = [];
+
+  const existing = await findAllWebPages();
+  for (const w of existing) {
+    (urls.includes(w.url) ? deleted : remaining).push(w);
+  }
+
+  await webPages.setValue(remaining);
+  return { deleted, remaining };
+}
