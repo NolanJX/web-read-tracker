@@ -16,6 +16,12 @@ const props = defineProps<{
 const emit = defineEmits<{ deleted: [] }>();
 
 const nodeIcon = props.nodeIconMap.get(props.nodeTree.root.id)!;
+const linkedUrl =
+  props.nodeTree.root.type === "Domain"
+    ? props.nodeTree.root.domain
+    : props.nodeTree.root.type === "WebPage"
+      ? props.nodeTree.root.webPageUrl
+      : "";
 const linkedWebPage =
   props.nodeTree.root.type === "WebPage"
     ? props.webPageMap.get(props.nodeTree.root.webPageUrl)
@@ -89,6 +95,10 @@ function title(str: string) {
 }
 
 // UI
+const isDoubleLine =
+  props.nodeTree.root.type === "Domain" ||
+  props.nodeTree.root.type === "WebPage";
+
 function getStatusColor(status: Status) {
   const map: Record<Status, string> = {
     read: "bg-green-500",
@@ -116,7 +126,19 @@ function getStatusColor(status: Status) {
         class="h-4 w-4"
       />
       <span v-else>{{ nodeIcon.data }}</span>
-      <span :title="props.nodeTree.root.name" class="flex-1 truncate">
+      <div v-if="isDoubleLine" class="flex min-w-0 flex-1 flex-col">
+        <div :title="props.nodeTree.root.name" class="truncate">
+          {{ props.nodeTree.root.name }}
+        </div>
+        <a
+          :href="linkedUrl"
+          target="_blank"
+          class="truncate text-xs text-gray-500"
+        >
+          {{ linkedUrl }}
+        </a>
+      </div>
+      <span v-else :title="props.nodeTree.root.name" class="flex-1 truncate">
         {{ props.nodeTree.root.name }}
       </span>
       <span
