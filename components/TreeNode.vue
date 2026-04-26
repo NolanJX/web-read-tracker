@@ -116,7 +116,9 @@ function getStatusColor(status: Status) {
         class="h-4 w-4"
       />
       <span v-else>{{ nodeIcon.data }}</span>
-      <span class="flex-1">{{ props.nodeTree.root.name }}</span>
+      <span :title="props.nodeTree.root.name" class="flex-1 truncate">
+        {{ props.nodeTree.root.name }}
+      </span>
       <span
         v-if="linkedWebPage !== undefined"
         :class="getStatusColor(linkedWebPage.status)"
