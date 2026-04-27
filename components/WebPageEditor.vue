@@ -347,7 +347,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
       </div>
 
       <!-- Node Tree -->
-      <div class="overflow-y-auto border-b">
+      <div class="overflow-y-auto border-b pr-4">
         <div
           v-for="item in flatTreeNodes"
           :key="item.node.id"
