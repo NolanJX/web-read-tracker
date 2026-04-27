@@ -27,7 +27,8 @@ export default defineContentScript({
       name: "web-page-editor",
       position: "modal",
       zIndex: zIndex,
-      onMount: (container, shadow) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onMount: (container, shadow, shadowHost) => {
         (shadow.firstElementChild as HTMLElement).style.zIndex = String(zIndex);
 
         const app = createApp(App, {
