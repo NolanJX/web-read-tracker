@@ -20,13 +20,16 @@ export default defineContentScript({
   cssInjectionMode: "ui",
 
   async main(ctx) {
+    const zIndex = 2 ** 31 - 1;
     let popupMessage!: PopupMessage;
 
     const ui = await createShadowRootUi(ctx, {
       name: "web-page-editor",
       position: "modal",
-      zIndex: 2 ** 31 - 1,
-      onMount: (container) => {
+      zIndex: zIndex,
+      onMount: (container, shadow) => {
+        (shadow.firstElementChild as HTMLElement).style.zIndex = String(zIndex);
+
         const app = createApp(App, {
           initialIsReadLayout: popupMessage.isReadLayout,
           initialFavicon: popupMessage.favicon,
