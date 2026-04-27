@@ -263,7 +263,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
 
 <template>
   <div class="flex-center fixed inset-0">
-    <div class="flex flex-col rounded border bg-white">
+    <div class="flex max-h-3/4 flex-col rounded border bg-white">
       <!-- Title Bar -->
       <div class="flex items-center justify-between border-b">
         <span class="text-sm">Web Page Editor</span>
@@ -347,7 +347,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
       </div>
 
       <!-- Node Tree -->
-      <div class="border-b">
+      <div class="overflow-y-auto border-b">
         <div
           v-for="item in flatTreeNodes"
           :key="item.node.id"
