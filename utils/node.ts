@@ -111,6 +111,43 @@ export async function saveWebPageNode(
   return (await saveNode({ ...node, type: "WebPage" })) as WebPageNode;
 }
 
+export async function saveManyNodes(
+  items: (Partial<Node> & Pick<Node, "name" | "parentId" | "order" | "type">)[],
+): Promise<Node[]> {
+  const existing = await nodes.getValue();
+  const saved: Node[] = [];
+
+  const now = Date.now();
+
+  for (const item of items) {
+    let node: Node;
+
+    if (item.id != null) {
+      const index = existing.findIndex((n) => n.id === item.id);
+      if (index >= 0) {
+        node = { ...existing[index], updatedAt: now, ...item } as Node;
+        existing[index] = node;
+      } else {
+        node = { createdAt: now, updatedAt: now, ...item } as Node;
+        existing.push(node);
+      }
+    } else {
+      node = {
+        id: crypto.randomUUID(),
+        createdAt: now,
+        updatedAt: now,
+        ...item,
+      } as Node;
+      existing.push(node);
+    }
+
+    saved.push(node);
+  }
+
+  await nodes.setValue(existing);
+  return saved;
+}
+
 export async function deleteNodeAndDescendants(
   id: string,
 ): Promise<{ deleted: Node[]; remaining: Node[] }> {

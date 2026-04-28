@@ -10,7 +10,7 @@ import {
   buildNodeTree,
   flattenNodeTree,
   findAllNodes,
-  saveNode,
+  saveManyNodes,
 } from "@/utils/node";
 
 const props = defineProps<{
@@ -140,9 +140,7 @@ async function handleConfirm() {
     readCount: readCount.value,
   });
 
-  for (const node of nodes.value) {
-    await saveNode(node);
-  }
+  await saveManyNodes(nodes.value);
 
   props.onClose();
 }
