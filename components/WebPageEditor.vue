@@ -364,7 +364,7 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
           class="flex justify-between"
           :class="{ 'bg-gray': newNodeIds.has(item.node.id) }"
         >
-          <div class="flex items-center">
+          <div class="flex min-w-0 items-center">
             <img
               v-if="nodeIconMap.get(item.node.id)?.type === 'img'"
               :src="nodeIconMap.get(item.node.id)!.data"
@@ -372,7 +372,9 @@ async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
               class="h-4 w-4"
             />
             <span v-else>{{ nodeIconMap.get(item.node.id)?.data }}</span>
-            <span class="text-sm">{{ item.node.name }}</span>
+            <span :title="item.node.name" class="truncate text-sm">
+              {{ item.node.name }}
+            </span>
           </div>
           <div class="flex">
             <button @click="handleCreateChildNode(item.node.id)">+</button>
