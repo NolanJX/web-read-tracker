@@ -130,6 +130,8 @@ async function handleConfirm() {
     return;
   }
 
+  console.time("[WebPageEditor] handleConfirm");
+
   if (favicon.value.data) {
     const domain = resolveDomain(props.url);
     await saveFavicon(domain, toRaw(favicon.value));
@@ -147,6 +149,8 @@ async function handleConfirm() {
   });
 
   await saveManyNodes(nodes.value);
+
+  console.timeEnd("[WebPageEditor] handleConfirm");
 
   isSaving.value = false;
   props.onClose();
