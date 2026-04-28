@@ -134,21 +134,27 @@ async function handleConfirm() {
 
   if (favicon.value.data) {
     const domain = resolveDomain(props.url);
+    console.time("[WebPageEditor] saveFavicon");
     await saveFavicon(domain, toRaw(favicon.value));
+    console.timeEnd("[WebPageEditor] saveFavicon");
   }
 
   if (status.value === "read" && readCount.value === 0) {
     readCount.value = 1;
   }
 
+  console.time("[WebPageEditor] saveWebPage");
   await saveWebPage({
     url: props.url,
     title: props.title,
     status: status.value,
     readCount: readCount.value,
   });
+  console.timeEnd("[WebPageEditor] saveWebPage");
 
+  console.time("[WebPageEditor] saveManyNodes");
   await saveManyNodes(nodes.value);
+  console.timeEnd("[WebPageEditor] saveManyNodes");
 
   console.timeEnd("[WebPageEditor] handleConfirm");
 
