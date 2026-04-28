@@ -25,6 +25,7 @@ const props = defineProps<{
 }>();
 
 const isReadLayout = ref(props.initialIsReadLayout);
+const isSaving = ref(false);
 
 // favicon
 const favicon = ref<Favicon>(props.initialFavicon);
@@ -118,9 +119,14 @@ function handleCancel() {
 }
 
 async function handleConfirm() {
+  if (isSaving.value) return;
+  isSaving.value = true;
+
   if (!existsLinkedNode(nodes.value)) {
     showMissingLinkedNodeTip.value = true;
     setTimeout(() => (showMissingLinkedNodeTip.value = false), 5000);
+
+    isSaving.value = false;
     return;
   }
 
@@ -142,6 +148,7 @@ async function handleConfirm() {
 
   await saveManyNodes(nodes.value);
 
+  isSaving.value = false;
   props.onClose();
 }
 
