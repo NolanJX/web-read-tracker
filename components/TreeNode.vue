@@ -11,6 +11,7 @@ const props = defineProps<{
   webPageMap: Map<string, WebPage>;
   nodeIconMap: Map<string, NodeIcon>;
   nodeTree: NodeTree;
+  depth: number;
 }>();
 
 const emit = defineEmits<{ deleted: [] }>();
@@ -28,7 +29,7 @@ const linkedWebPage =
     : undefined;
 
 const isPendingDeletion = ref(false);
-const isExpanded = ref(true);
+const isExpanded = ref(props.depth > 0);
 
 async function handleDelete() {
   if (!isPendingDeletion.value) {
@@ -170,6 +171,7 @@ function getStatusColor(status: Status) {
         :web-page-map="props.webPageMap"
         :node-icon-map="props.nodeIconMap"
         :node-tree="item"
+        :depth="props.depth + 1"
         @deleted="onDeleted"
         class="not-first:border-t not-first:border-gray-300 not-first:pt-1"
       >
