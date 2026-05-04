@@ -1,9 +1,13 @@
+import { migrateFaviconStorage } from "@/utils/favicon";
 import { createRootNode } from "@/utils/node";
 
 export default defineBackground(() => {
   browser.runtime.onInstalled.addListener(async ({ reason }) => {
-    if (reason !== "install") return;
-    await createRootNode();
+    if (reason === "install") {
+      await createRootNode();
+    } else if (reason === "update") {
+      await migrateFaviconStorage();
+    }
   });
 
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
