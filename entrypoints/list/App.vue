@@ -39,8 +39,8 @@ onMounted(async () => {
   await loadData();
 });
 
-async function loadData() {
-  isLoading.value = true;
+async function loadData(showLoading = true) {
+  if (showLoading) isLoading.value = true;
 
   const [webPages, nodes] = await Promise.all([
     findAllWebPages(),
@@ -170,7 +170,7 @@ function getTabColor(tab: Tab) {
           :node-icon-map="nodeIconMap"
           :node-tree="item"
           :depth="0"
-          @deleted="loadData"
+          @deleted="loadData(false)"
           class="rounded border p-1 not-first:mt-1"
         ></TreeNode>
       </div>
