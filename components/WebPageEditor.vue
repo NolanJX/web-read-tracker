@@ -134,9 +134,13 @@ async function handleConfirm() {
 
   if (favicon.value.data) {
     const domain = resolveDomain(props.url);
-    console.time("[WebPageEditor] saveFavicon");
-    await saveFavicon(domain, toRaw(favicon.value));
-    console.timeEnd("[WebPageEditor] saveFavicon");
+    const existing = await findFavicon(domain);
+
+    if (existing !== undefined) {
+      console.time("[WebPageEditor] saveFavicon");
+      await saveFavicon(domain, toRaw(favicon.value));
+      console.timeEnd("[WebPageEditor] saveFavicon");
+    }
   }
 
   if (status.value === "read" && readCount.value === 0) {
