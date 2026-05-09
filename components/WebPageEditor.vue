@@ -69,33 +69,6 @@ watchEffect(() => {
 onMounted(async () => {
   nodes.value = await findAllNodes();
   root.value = nodes.value.find((n) => n.id === ROOT_ID)!;
-
-  if (!existsLinkedNode(nodes.value)) {
-    const parentId = ROOT_ID;
-    const rootChildren = nodes.value.filter((n) => n.parentId === parentId);
-
-    const id = crypto.randomUUID();
-    const now = Date.now();
-
-    nodes.value.push({
-      id,
-      name: props.title,
-      parentId: parentId,
-      order: rootChildren.length,
-      createdAt: now,
-      updatedAt: now,
-      type: "WebPage",
-      webPageUrl: props.url,
-    });
-    newNodeIds.add(id);
-
-    nodeIconMap.set(
-      id,
-      favicon.value.data
-        ? { type: "img", data: favicon.value.data }
-        : { type: "text", data: "📄" },
-    );
-  }
 });
 
 function resolveDomain(url: string) {
