@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
-import { findFavicon } from "@/utils/favicon";
+import { type Domain, type Favicon, findFavicon } from "@/utils/favicon";
 import {
   type Status,
   type WebPage,
@@ -25,7 +25,9 @@ const activeTab = ref<Tab>("all");
 type NodeIcon = { type: "text"; data: string } | { type: "img"; data: string };
 const nodeIconMap = ref<Map<string, NodeIcon>>(new Map());
 
+const webPages = ref<WebPage[]>([]);
 const webPageMap = ref<Map<string, WebPage>>(new Map());
+const nodes = ref<Node[]>([]);
 const nodeTrees = ref<NodeTree[]>([]);
 
 const filteredNodeTrees = computed(() => {
@@ -42,20 +44,20 @@ onMounted(async () => {
 async function loadData(showLoading = true) {
   if (showLoading) isLoading.value = true;
 
-  const [webPages, nodes] = await Promise.all([
+  [webPages.value, nodes.value] = await Promise.all([
     findAllWebPages(),
     findAllNodes(),
   ]);
 
-  webPageMap.value = new Map(webPages.map((w) => [w.url, w]));
+  webPageMap.value = new Map(webPages.value.map((w) => [w.url, w]));
   nodeIconMap.value = new Map(
     await Promise.all(
-      nodes.map(async (n) => [n.id, await resolveNodeIcon(n)] as const),
+      nodes.value.map(async (n) => [n.id, await resolveNodeIcon(n)] as const),
     ),
   );
 
-  const root = nodes.find((n) => n.id === ROOT_ID)!;
-  const rootTree = buildNodeTree(root, nodes);
+  const root = nodes.value.find((n) => n.id === ROOT_ID)!;
+  const rootTree = buildNodeTree(root, nodes.value);
   nodeTrees.value = rootTree.subtrees;
 
   isLoading.value = false;
@@ -124,6 +126,34 @@ function title(str: string) {
     .join(" ");
 }
 
+async function handleExport() {
+  const domainToFavicon: Record<Domain, Favicon> = {};
+  const domainNodes = nodes.value.filter((n) => n.type === "Domain");
+
+  for (const node of domainNodes) {
+    const favicon = await findFavicon(node.domain);
+    if (favicon !== undefined) domainToFavicon[node.domain] = favicon;
+  }
+
+  const data = {
+    domainToFavicon,
+    webPages: webPages.value,
+    nodes: nodes.value,
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json",
+  });
+  const url = URL.createObjectURL(blob);
+
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "web-read-tracker.json";
+  anchor.click();
+
+  URL.revokeObjectURL(url);
+}
+
 // UI
 function getTabColor(tab: Tab) {
   const map: Record<Tab, string> = {
@@ -138,6 +168,13 @@ function getTabColor(tab: Tab) {
 
 <template>
   <div class="mx-auto w-2/5">
+    <div class="flex justify-center gap-x-4 pt-3">
+      <button class="flex-1 rounded border text-base">Import</button>
+      <button @click="handleExport" class="flex-1 rounded border text-base">
+        Export
+      </button>
+    </div>
+
     <!-- Tabs -->
     <div class="flex justify-center gap-x-4 border-b py-3">
       <button
