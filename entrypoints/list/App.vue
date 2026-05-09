@@ -1,11 +1,18 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
-import { type Domain, type Favicon, findFavicon } from "@/utils/favicon";
+import { isPlainObject } from "is-plain-object";
+import {
+  type Domain,
+  type Favicon,
+  findFavicon,
+  saveFavicon,
+} from "@/utils/favicon";
 import {
   type Status,
   type WebPage,
   STATUSES,
   findAllWebPages,
+  saveWebPage,
 } from "@/utils/web-page";
 import {
   type Node,
@@ -13,6 +20,7 @@ import {
   ROOT_ID,
   findAllNodes,
   buildNodeTree,
+  saveManyNodes,
 } from "@/utils/node";
 import TreeNode from "@/components/TreeNode.vue";
 
@@ -126,7 +134,46 @@ function title(str: string) {
     .join(" ");
 }
 
-async function handleImport() {}
+async function handleImport(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const files = input.files;
+
+  if (files === null || files.length > 1) return;
+
+  const file = files[0];
+  const text = await file.text();
+
+  let data: {
+    domainToFavicon: Record<Domain, Favicon>;
+    webPages: WebPage[];
+    nodes: Node[];
+  };
+
+  try {
+    data = JSON.parse(text);
+    if (
+      !isPlainObject(data) ||
+      !isPlainObject(data.domainToFavicon) ||
+      !Array.isArray(data.webPages) ||
+      !Array.isArray(data.nodes)
+    )
+      throw new Error();
+  } catch {
+    input.value = "";
+    return;
+  }
+
+  await Promise.all(
+    Object.entries(data.domainToFavicon).map(
+      ([domain, favicon]: [Domain, Favicon]) => saveFavicon(domain, favicon),
+    ),
+  );
+  await Promise.all(data.webPages.map((w) => saveWebPage(w)));
+  await saveManyNodes(data.nodes);
+
+  input.value = "";
+  await loadData();
+}
 
 async function handleExport() {
   const domainToFavicon: Record<Domain, Favicon> = {};
