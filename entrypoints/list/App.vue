@@ -177,11 +177,19 @@ async function handleImport(event: Event) {
 
 async function handleExport() {
   const domainToFavicon: Record<Domain, Favicon> = {};
-  const domainNodes = nodes.value.filter((n) => n.type === "Domain");
+  const domains = new Set<Domain>();
 
-  for (const node of domainNodes) {
-    const favicon = await findFavicon(node.domain);
-    if (favicon !== undefined) domainToFavicon[node.domain] = favicon;
+  for (const node of nodes.value) {
+    if (node.type === "Domain") {
+      domains.add(node.domain);
+    } else if (node.type === "WebPage") {
+      domains.add(resolveDomain(node.webPageUrl));
+    }
+  }
+
+  for (const domain of domains) {
+    const favicon = await findFavicon(domain);
+    if (favicon !== undefined) domainToFavicon[domain] = favicon;
   }
 
   const data = {
