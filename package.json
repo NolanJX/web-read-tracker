@@ -16,6 +16,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "is-plain-object": "^5.0.0",
     "vue": "^3.5.29"
   },
   "devDependencies": {
