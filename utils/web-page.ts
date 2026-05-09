@@ -48,6 +48,34 @@ export async function saveWebPage(
   return webPage;
 }
 
+export async function saveManyWebPages(
+  items: (Partial<WebPage> &
+    Pick<WebPage, "url" | "title" | "status" | "readCount">)[],
+): Promise<WebPage[]> {
+  const existing = await findAllWebPages();
+  const saved: WebPage[] = [];
+
+  const now = Date.now();
+
+  for (const item of items) {
+    let webPage: WebPage;
+    const index = existing.findIndex((w) => w.url === item.url);
+
+    if (index >= 0) {
+      webPage = { ...existing[index], updatedAt: now, ...item } as WebPage;
+      existing[index] = webPage;
+    } else {
+      webPage = { createdAt: now, updatedAt: now, ...item } as WebPage;
+      existing.push(webPage);
+    }
+
+    saved.push(webPage);
+  }
+
+  await webPages.setValue(existing);
+  return saved;
+}
+
 export async function deleteWebPages(
   urls: string[],
 ): Promise<{ deleted: WebPage[]; remaining: WebPage[] }> {

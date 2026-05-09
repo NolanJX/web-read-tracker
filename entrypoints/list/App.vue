@@ -12,7 +12,7 @@ import {
   type WebPage,
   STATUSES,
   findAllWebPages,
-  saveWebPage,
+  saveManyWebPages,
 } from "@/utils/web-page";
 import {
   type Node,
@@ -168,7 +168,7 @@ async function handleImport(event: Event) {
       ([domain, favicon]: [Domain, Favicon]) => saveFavicon(domain, favicon),
     ),
   );
-  await Promise.all(data.webPages.map((w) => saveWebPage(w)));
+  await saveManyWebPages(data.webPages);
   await saveManyNodes(data.nodes);
 
   input.value = "";
