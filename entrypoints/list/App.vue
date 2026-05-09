@@ -126,6 +126,8 @@ function title(str: string) {
     .join(" ");
 }
 
+async function handleImport() {}
+
 async function handleExport() {
   const domainToFavicon: Record<Domain, Favicon> = {};
   const domainNodes = nodes.value.filter((n) => n.type === "Domain");
@@ -169,7 +171,18 @@ function getTabColor(tab: Tab) {
 <template>
   <div class="mx-auto w-2/5">
     <div class="flex justify-center gap-x-4 pt-3">
-      <button class="flex-1 rounded border text-base">Import</button>
+      <label
+        :class="{ 'pointer-events-none opacity-50': nodeTrees.length > 0 }"
+        class="flex-1 overflow-hidden rounded border text-center text-base"
+      >
+        Import
+        <input
+          @change="handleImport"
+          type="file"
+          accept=".json"
+          class="hidden"
+        />
+      </label>
       <button @click="handleExport" class="flex-1 rounded border text-base">
         Export
       </button>
