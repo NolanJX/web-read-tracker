@@ -1,7 +1,12 @@
 <script lang="ts" setup>
 import { ref, computed, toRaw, reactive, watchEffect, onMounted } from "vue";
 import "virtual:uno.css";
-import { type Favicon, saveFavicon, findFavicon } from "@/utils/favicon";
+import {
+  type Domain,
+  type Favicon,
+  saveFavicon,
+  findFavicon,
+} from "@/utils/favicon";
 import { type Status, STATUSES, saveWebPage } from "@/utils/web-page";
 import {
   type Node,
@@ -29,6 +34,7 @@ const isSaving = ref(false);
 
 // favicon
 const favicon = ref<Favicon>(props.initialFavicon);
+const domainToFavicon: Record<Domain, Favicon> = {};
 
 // webPage
 const status = ref<Status>(props.initialStatus);
@@ -59,9 +65,31 @@ const nodeIconMap = reactive(new Map<string, NodeIcon>());
 watchEffect(() => {
   for (const item of flatTreeNodes.value) {
     if (!nodeIconMap.has(item.node.id)) {
-      resolveNodeIcon(item.node).then((nodeIcon) =>
-        nodeIconMap.set(item.node.id, nodeIcon),
-      );
+      let domain = null;
+      let domainFavicon = null;
+
+      if (item.node.type === "Domain") {
+        domain = item.node.domain;
+        domainFavicon = domainToFavicon[domain];
+      } else if (item.node.type === "WebPage") {
+        domain = resolveDomain(item.node.webPageUrl);
+        domainFavicon = domainToFavicon[domain];
+      }
+
+      if (domainFavicon != null) {
+        nodeIconMap.set(item.node.id, {
+          type: "img",
+          data: domainFavicon.data,
+        });
+        continue;
+      }
+
+      resolveNodeIcon(item.node).then((nodeIcon) => {
+        if (domain !== null && nodeIcon.type === "img") {
+          domainToFavicon[domain] = { src: nodeIcon.data, data: nodeIcon.data };
+        }
+        nodeIconMap.set(item.node.id, nodeIcon);
+      });
     }
   }
 });
