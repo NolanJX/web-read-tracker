@@ -1,4 +1,9 @@
-import { Domain } from "./favicon";
+import {
+  type Domain,
+  type Favicon,
+  resolveDomain,
+  findFavicon,
+} from "./favicon";
 
 type BaseNode = {
   id: string; // UUID
@@ -204,4 +209,74 @@ export function flattenNodeTree(
   }
 
   return flatTreeNodes;
+}
+
+export type NodeIcon =
+  | { type: "text"; data: string }
+  | { type: "img"; data: string };
+
+function resolveNodeDomain(node: Node): Domain | null {
+  let domain = null;
+
+  switch (node.type) {
+    case "Domain":
+      domain = node.domain;
+      break;
+    case "WebPage":
+      domain = resolveDomain(node.webPageUrl);
+      break;
+  }
+
+  return domain;
+}
+
+function fallbackNodeIcon(node: Node): NodeIcon {
+  let nodeIcon!: NodeIcon;
+
+  switch (node.type) {
+    case "Folder":
+      nodeIcon = { type: "text", data: "📁" };
+      break;
+    case "Domain":
+      nodeIcon = { type: "text", data: "🌐" };
+      break;
+    case "WebPage":
+      nodeIcon = { type: "text", data: "📄" };
+      break;
+  }
+
+  return nodeIcon;
+}
+
+export async function resolveNodeIcons(
+  nodes: Node[],
+): Promise<Map<string, NodeIcon>> {
+  const domainToFaviconPromise = new Map<
+    Domain,
+    Promise<Favicon | undefined> // not caching the resolved Favicon value
+  >();
+
+  async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
+    const domain = resolveNodeDomain(node);
+    if (domain === null) return fallbackNodeIcon(node);
+
+    let faviconPromise = domainToFaviconPromise.get(domain);
+    if (faviconPromise === undefined) {
+      faviconPromise = findFavicon(domain);
+      domainToFaviconPromise.set(domain, faviconPromise);
+    }
+
+    const favicon = await faviconPromise; // yield to the event loop
+    return favicon !== undefined
+      ? { type: "img", data: favicon.data }
+      : fallbackNodeIcon(node);
+  }
+
+  return new Map(
+    await Promise.all(
+      nodes.map(
+        async (node) => [node.id, await resolveNodeIcon(node)] as const,
+      ),
+    ),
+  );
 }

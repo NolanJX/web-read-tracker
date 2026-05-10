@@ -10,6 +10,10 @@ const domainToFavicon = new Map<
   WxtStorageItem<Favicon | null, Record<Domain, never>>
 >();
 
+export function resolveDomain(url: string) {
+  return new URL(url).hostname as Domain;
+}
+
 function obtainStorageItem(
   domain: Domain,
 ): WxtStorageItem<Favicon | null, Record<Domain, never>> {

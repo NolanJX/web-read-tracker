@@ -1,21 +1,18 @@
 <script lang="ts" setup>
-import { ref, computed, toRaw, reactive, watchEffect, onMounted } from "vue";
+import { ref, computed, toRaw, reactive, onMounted } from "vue";
 import "virtual:uno.css";
-import {
-  type Domain,
-  type Favicon,
-  saveFavicon,
-  findFavicon,
-} from "@/utils/favicon";
+import { type Favicon, saveFavicon, findFavicon } from "@/utils/favicon";
 import { type Status, STATUSES, saveWebPage } from "@/utils/web-page";
 import {
   type Node,
   type FlatTreeNode,
+  type NodeIcon,
   ROOT_ID,
   buildNodeTree,
   flattenNodeTree,
   findAllNodes,
   saveManyNodes,
+  resolveNodeIcons,
 } from "@/utils/node";
 
 const props = defineProps<{
@@ -34,7 +31,6 @@ const isSaving = ref(false);
 
 // favicon
 const favicon = ref<Favicon>(props.initialFavicon);
-const domainToFavicon: Record<Domain, Favicon> = {};
 
 // webPage
 const status = ref<Status>(props.initialStatus);
@@ -59,44 +55,14 @@ const flatTreeNodes = computed<FlatTreeNode[]>(() => {
   return flattenNodeTree(nodeTree);
 });
 
-type NodeIcon = { type: "text"; data: string } | { type: "img"; data: string };
 const nodeIconMap = reactive(new Map<string, NodeIcon>());
-
-watchEffect(() => {
-  for (const item of flatTreeNodes.value) {
-    if (!nodeIconMap.has(item.node.id)) {
-      let domain = null;
-      let domainFavicon = null;
-
-      if (item.node.type === "Domain") {
-        domain = item.node.domain;
-        domainFavicon = domainToFavicon[domain];
-      } else if (item.node.type === "WebPage") {
-        domain = resolveDomain(item.node.webPageUrl);
-        domainFavicon = domainToFavicon[domain];
-      }
-
-      if (domainFavicon != null) {
-        nodeIconMap.set(item.node.id, {
-          type: "img",
-          data: domainFavicon.data,
-        });
-        continue;
-      }
-
-      resolveNodeIcon(item.node).then((nodeIcon) => {
-        if (domain !== null && nodeIcon.type === "img") {
-          domainToFavicon[domain] = { src: nodeIcon.data, data: nodeIcon.data };
-        }
-        nodeIconMap.set(item.node.id, nodeIcon);
-      });
-    }
-  }
-});
 
 onMounted(async () => {
   nodes.value = await findAllNodes();
   root.value = nodes.value.find((n) => n.id === ROOT_ID)!;
+
+  const nodeIcons = await resolveNodeIcons(nodes.value);
+  nodeIcons.forEach((nodeIcon, nodeId) => nodeIconMap.set(nodeId, nodeIcon));
 });
 
 function resolveDomain(url: string) {
@@ -243,42 +209,6 @@ const newNode = ref<Pick<Node, "name" | "parentId" | "type">>({
   parentId: ROOT_ID,
   type: "WebPage",
 });
-
-async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
-  const nodeIcon = { type: "text", data: "" };
-
-  switch (node.type) {
-    case "Folder":
-      nodeIcon.data = "📁";
-      break;
-    case "Domain": {
-      const domain = node.domain;
-      const favicon = await findFavicon(domain);
-
-      if (favicon !== undefined) {
-        nodeIcon.type = "img";
-        nodeIcon.data = favicon.data;
-      } else {
-        nodeIcon.data = "🌐";
-      }
-      break;
-    }
-    case "WebPage": {
-      const domain = resolveDomain(node.webPageUrl);
-      const favicon = await findFavicon(domain);
-
-      if (favicon !== undefined) {
-        nodeIcon.type = "img";
-        nodeIcon.data = favicon.data;
-      } else {
-        nodeIcon.data = "📄";
-      }
-      break;
-    }
-  }
-
-  return nodeIcon as NodeIcon;
-}
 </script>
 
 <template>
