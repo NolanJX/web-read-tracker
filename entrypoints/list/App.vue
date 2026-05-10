@@ -17,10 +17,12 @@ import {
 import {
   type Node,
   type NodeTree,
+  type NodeIcon,
   ROOT_ID,
   findAllNodes,
   buildNodeTree,
   saveManyNodes,
+  resolveNodeIcons,
 } from "@/utils/node";
 import TreeNode from "@/components/TreeNode.vue";
 
@@ -30,7 +32,6 @@ type Tab = (typeof TABS)[number];
 const isLoading = ref(true);
 const activeTab = ref<Tab>("all");
 
-type NodeIcon = { type: "text"; data: string } | { type: "img"; data: string };
 const nodeIconMap = ref<Map<string, NodeIcon>>(new Map());
 
 const webPages = ref<WebPage[]>([]);
@@ -58,11 +59,7 @@ async function loadData(showLoading = true) {
   ]);
 
   webPageMap.value = new Map(webPages.value.map((w) => [w.url, w]));
-  nodeIconMap.value = new Map(
-    await Promise.all(
-      nodes.value.map(async (n) => [n.id, await resolveNodeIcon(n)] as const),
-    ),
-  );
+  nodeIconMap.value = await resolveNodeIcons(nodes.value);
 
   const root = nodes.value.find((n) => n.id === ROOT_ID)!;
   const rootTree = buildNodeTree(root, nodes.value);
@@ -84,42 +81,6 @@ function filterNodeTree(nodeTree: NodeTree, status: Status): NodeTree | null {
 
   if (filteredSubtrees.length === 0) return null;
   return { root: nodeTree.root, subtrees: filteredSubtrees };
-}
-
-async function resolveNodeIcon(node: Node): Promise<NodeIcon> {
-  const nodeIcon = { type: "text", data: "" };
-
-  switch (node.type) {
-    case "Folder":
-      nodeIcon.data = "📁";
-      break;
-    case "Domain": {
-      const domain = node.domain;
-      const favicon = await findFavicon(domain);
-
-      if (favicon !== undefined) {
-        nodeIcon.type = "img";
-        nodeIcon.data = favicon.data;
-      } else {
-        nodeIcon.data = "🌐";
-      }
-      break;
-    }
-    case "WebPage": {
-      const domain = resolveDomain(node.webPageUrl);
-      const favicon = await findFavicon(domain);
-
-      if (favicon !== undefined) {
-        nodeIcon.type = "img";
-        nodeIcon.data = favicon.data;
-      } else {
-        nodeIcon.data = "📄";
-      }
-      break;
-    }
-  }
-
-  return nodeIcon as NodeIcon;
 }
 
 function resolveDomain(url: string) {
