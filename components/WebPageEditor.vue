@@ -103,7 +103,7 @@ async function handleConfirm() {
     const domain = resolveDomain(props.url);
     const existing = await findFavicon(domain);
 
-    if (existing !== undefined) {
+    if (existing === undefined) {
       console.time("[WebPageEditor] saveFavicon");
       await saveFavicon(domain, toRaw(favicon.value));
       console.timeEnd("[WebPageEditor] saveFavicon");
