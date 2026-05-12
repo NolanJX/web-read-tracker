@@ -166,7 +166,8 @@ async function handleExport() {
 
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = "web-read-tracker.json";
+  const ts = new Date().toISOString().split(".")[0].replace(/[-T:]/g, "");
+  anchor.download = `web-read-tracker-${ts}.json`;
   anchor.click();
 
   URL.revokeObjectURL(url);
