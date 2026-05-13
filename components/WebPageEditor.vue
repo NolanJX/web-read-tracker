@@ -56,6 +56,7 @@ const flatTreeNodes = computed<FlatTreeNode[]>(() => {
 });
 
 const nodeIconMap = reactive(new Map<string, NodeIcon>());
+const nodeDivMap = new Map<string, HTMLDivElement>();
 
 onMounted(async () => {
   nodes.value = await findAllNodes();
@@ -63,10 +64,37 @@ onMounted(async () => {
 
   const nodeIcons = await resolveNodeIcons(nodes.value);
   nodeIcons.forEach((nodeIcon, nodeId) => nodeIconMap.set(nodeId, nodeIcon));
+
+  scrollToSameDomainNode();
 });
 
 function resolveDomain(url: string) {
   return new URL(url).hostname;
+}
+
+function extractMainDomain(hostname: string) {
+  const splits = hostname.split(".");
+  return splits.slice(-2).join(".");
+}
+
+function scrollToSameDomainNode() {
+  const domain = resolveDomain(props.url);
+  const mainDomain = extractMainDomain(domain);
+
+  const matched = flatTreeNodes.value.find((item) => {
+    if (item.node.parentId !== ROOT_ID) return false;
+    if (item.node.type === "Domain")
+      return extractMainDomain(item.node.domain) === mainDomain;
+    if (item.node.type === "WebPage")
+      return (
+        extractMainDomain(resolveDomain(item.node.webPageUrl)) === mainDomain
+      );
+    return false;
+  });
+  if (matched === undefined) return;
+
+  const el = nodeDivMap.get(matched.node.id)!;
+  el.scrollIntoView();
 }
 
 function existsLinkedNode(nodes: Node[]) {
@@ -301,6 +329,7 @@ const newNode = ref<Pick<Node, "name" | "parentId" | "type">>({
         <div
           v-for="item in flatTreeNodes"
           :key="item.node.id"
+          :ref="(el) => nodeDivMap.set(item.node.id, el as HTMLDivElement)"
           :style="{ marginLeft: `${item.depth}rem` }"
           class="flex justify-between"
           :class="{ 'bg-gray': newNodeIds.has(item.node.id) }"
