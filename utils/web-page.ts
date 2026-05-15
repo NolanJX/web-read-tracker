@@ -20,7 +20,7 @@ export async function findAllWebPages(): Promise<WebPage[]> {
 
 export async function findWebPage(url: string): Promise<WebPage | undefined> {
   const existing = await findAllWebPages();
-  return existing.find((w) => w.url === url);
+  return existing.find((webPage) => webPage.url === url);
 }
 
 export async function saveWebPage(
@@ -83,8 +83,8 @@ export async function deleteWebPages(
   const remaining: WebPage[] = [];
 
   const existing = await findAllWebPages();
-  for (const w of existing) {
-    (urls.includes(w.url) ? deleted : remaining).push(w);
+  for (const webPage of existing) {
+    (urls.includes(webPage.url) ? deleted : remaining).push(webPage);
   }
 
   await webPages.setValue(remaining);

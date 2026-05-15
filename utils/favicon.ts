@@ -39,7 +39,9 @@ export async function saveFavicon(
 }
 
 export async function deleteFavicons(domains: Domain[]): Promise<void> {
-  await Promise.all(domains.map((d) => obtainStorageItem(d).removeValue()));
+  await Promise.all(
+    domains.map((domain) => obtainStorageItem(domain).removeValue()),
+  );
 }
 
 export async function fetchFavicon(url: string): Promise<Favicon> {

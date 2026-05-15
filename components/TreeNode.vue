@@ -42,14 +42,16 @@ async function handleDelete() {
 
   // From WebPageNode
   const deletedUrls = deletedNodes
-    .filter((n) => n.type === "WebPage")
-    .map((n) => n.webPageUrl);
+    .filter((deletedNode) => deletedNode.type === "WebPage")
+    .map((deletedNode) => deletedNode.webPageUrl);
 
   if (deletedUrls.length > 0) {
     const remainingUrls = remainingNodes
-      .filter((n) => n.type === "WebPage")
-      .map((n) => n.webPageUrl);
-    const orphanUrls = deletedUrls.filter((u) => !remainingUrls.includes(u));
+      .filter((remainingNode) => remainingNode.type === "WebPage")
+      .map((remainingNode) => remainingNode.webPageUrl);
+    const orphanUrls = deletedUrls.filter(
+      (deletedUrl) => !remainingUrls.includes(deletedUrl),
+    );
 
     if (orphanUrls.length > 0) {
       await deleteWebPages(orphanUrls);
@@ -58,17 +60,29 @@ async function handleDelete() {
 
   // From DomainNode + WebPageNode
   const deletedDomains = deletedNodes
-    .filter((n) => n.type === "Domain" || n.type === "WebPage")
-    .map((n) => (n.type === "Domain" ? n.domain : resolveDomain(n.webPageUrl)));
+    .filter(
+      (deletedNode) =>
+        deletedNode.type === "Domain" || deletedNode.type === "WebPage",
+    )
+    .map((deletedNode) =>
+      deletedNode.type === "Domain"
+        ? deletedNode.domain
+        : resolveDomain(deletedNode.webPageUrl),
+    );
 
   if (deletedDomains.length > 0) {
     const remainingDomains = remainingNodes
-      .filter((n) => n.type === "Domain" || n.type === "WebPage")
-      .map((n) =>
-        n.type === "Domain" ? n.domain : resolveDomain(n.webPageUrl),
+      .filter(
+        (remainingNode) =>
+          remainingNode.type === "Domain" || remainingNode.type === "WebPage",
+      )
+      .map((remainingNode) =>
+        remainingNode.type === "Domain"
+          ? remainingNode.domain
+          : resolveDomain(remainingNode.webPageUrl),
       );
     const orphanDomains = deletedDomains.filter(
-      (d) => !remainingDomains.includes(d),
+      (deletedDomain) => !remainingDomains.includes(deletedDomain),
     );
 
     if (orphanDomains.length > 0) {

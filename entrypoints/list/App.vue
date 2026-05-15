@@ -42,8 +42,8 @@ const nodeTrees = ref<NodeTree[]>([]);
 const filteredNodeTrees = computed(() => {
   if (activeTab.value === "all") return nodeTrees.value;
   return nodeTrees.value
-    .map((t) => filterNodeTree(t, activeTab.value as Status))
-    .filter((t) => t !== null);
+    .map((nodeTree) => filterNodeTree(nodeTree, activeTab.value as Status))
+    .filter((nodeTree) => nodeTree !== null);
 });
 
 onMounted(async () => {
@@ -58,10 +58,12 @@ async function loadData(showLoading = true) {
     findAllNodes(),
   ]);
 
-  webPageMap.value = new Map(webPages.value.map((w) => [w.url, w]));
+  webPageMap.value = new Map(
+    webPages.value.map((webPage) => [webPage.url, webPage]),
+  );
   nodeIconMap.value = await resolveNodeIcons(nodes.value);
 
-  const root = nodes.value.find((n) => n.id === ROOT_ID)!;
+  const root = nodes.value.find((node) => node.id === ROOT_ID)!;
   const rootTree = buildNodeTree(root, nodes.value);
   nodeTrees.value = rootTree.subtrees;
 
@@ -76,8 +78,8 @@ function filterNodeTree(nodeTree: NodeTree, status: Status): NodeTree | null {
   }
 
   const filteredSubtrees = nodeTree.subtrees
-    .map((t) => filterNodeTree(t, status))
-    .filter((t): t is NodeTree => t !== null);
+    .map((subtree) => filterNodeTree(subtree, status))
+    .filter((subtree): subtree is NodeTree => subtree !== null);
 
   if (filteredSubtrees.length === 0) return null;
   return { root: nodeTree.root, subtrees: filteredSubtrees };

@@ -60,7 +60,7 @@ const nodeDivMap = new Map<string, HTMLDivElement>();
 
 onMounted(async () => {
   nodes.value = await findAllNodes();
-  root.value = nodes.value.find((n) => n.id === ROOT_ID)!;
+  root.value = nodes.value.find((node) => node.id === ROOT_ID)!;
 
   const nodeIcons = await resolveNodeIcons(nodes.value);
   nodeIcons.forEach((nodeIcon, nodeId) => nodeIconMap.set(nodeId, nodeIcon));
@@ -81,13 +81,14 @@ function scrollToSameDomainNode() {
   const domain = resolveDomain(props.url);
   const mainDomain = extractMainDomain(domain);
 
-  const matched = flatTreeNodes.value.find((item) => {
-    if (item.node.parentId !== ROOT_ID) return false;
-    if (item.node.type === "Domain")
-      return extractMainDomain(item.node.domain) === mainDomain;
-    if (item.node.type === "WebPage")
+  const matched = flatTreeNodes.value.find((flatTreeNode) => {
+    if (flatTreeNode.node.parentId !== ROOT_ID) return false;
+    if (flatTreeNode.node.type === "Domain")
+      return extractMainDomain(flatTreeNode.node.domain) === mainDomain;
+    if (flatTreeNode.node.type === "WebPage")
       return (
-        extractMainDomain(resolveDomain(item.node.webPageUrl)) === mainDomain
+        extractMainDomain(resolveDomain(flatTreeNode.node.webPageUrl)) ===
+        mainDomain
       );
     return false;
   });
@@ -98,11 +99,13 @@ function scrollToSameDomainNode() {
 }
 
 function existsLinkedNode(nodes: Node[]) {
-  return nodes.some((n) => n.type === "WebPage" && n.webPageUrl === props.url);
+  return nodes.some(
+    (node) => node.type === "WebPage" && node.webPageUrl === props.url,
+  );
 }
 
 function findAllDescendantNodeIds(nodeId: string): string[] {
-  const children = nodes.value.filter((n) => n.parentId === nodeId);
+  const children = nodes.value.filter((node) => node.parentId === nodeId);
   return children.flatMap((child) => [
     child.id,
     ...findAllDescendantNodeIds(child.id),
@@ -176,7 +179,7 @@ function handleCreateChildNode(nodeId: string) {
 
 function handleDeleteNode(nodeId: string) {
   const idsToDelete = [nodeId, ...findAllDescendantNodeIds(nodeId)];
-  nodes.value = nodes.value.filter((n) => !idsToDelete.includes(n.id));
+  nodes.value = nodes.value.filter((node) => !idsToDelete.includes(node.id));
   for (const id of idsToDelete) {
     newNodeIds.delete(id);
     nodeIconMap.delete(id);

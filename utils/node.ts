@@ -34,7 +34,7 @@ export async function findWebPageNodesByUrl(
 ): Promise<WebPageNode[]> {
   const existing = await findAllNodes();
   return existing.filter(
-    (n) => n.type === "WebPage" && n.webPageUrl === webPageUrl,
+    (node) => node.type === "WebPage" && node.webPageUrl === webPageUrl,
   );
 }
 
@@ -43,7 +43,7 @@ export async function existsWebPageNodeByUrl(
 ): Promise<boolean> {
   const existing = await findAllNodes();
   return existing.some(
-    (n) => n.type === "WebPage" && n.webPageUrl === webPageUrl,
+    (node) => node.type === "WebPage" && node.webPageUrl === webPageUrl,
   );
 }
 
@@ -161,7 +161,9 @@ export async function deleteNodeAndDescendants(
 
   function collectIds(id: string) {
     idsToDelete.push(id);
-    existing.filter((n) => n.parentId === id).forEach((n) => collectIds(n.id));
+    existing
+      .filter((node) => node.parentId === id)
+      .forEach((node) => collectIds(node.id));
   }
 
   collectIds(id);
@@ -169,8 +171,8 @@ export async function deleteNodeAndDescendants(
   const deleted: Node[] = [];
   const remaining: Node[] = [];
 
-  for (const n of existing) {
-    (idsToDelete.includes(n.id) ? deleted : remaining).push(n);
+  for (const node of existing) {
+    (idsToDelete.includes(node.id) ? deleted : remaining).push(node);
   }
 
   await nodes.setValue(remaining);
@@ -184,9 +186,9 @@ export interface NodeTree {
 
 export function buildNodeTree(root: Node, nodes: Node[]): NodeTree {
   const children = nodes
-    .filter((n) => n.parentId === root.id)
+    .filter((node) => node.parentId === root.id)
     .sort((a, b) => a.order - b.order);
-  const subtrees = children.map((n) => buildNodeTree(n, nodes));
+  const subtrees = children.map((node) => buildNodeTree(node, nodes));
 
   return { root, subtrees };
 }

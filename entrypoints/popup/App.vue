@@ -107,7 +107,7 @@ async function handleConfirm() {
 
   if (!linkedNodeExists) {
     const nodes = await findAllNodes();
-    const rootChildren = nodes.filter((n) => n.parentId === ROOT_ID);
+    const rootChildren = nodes.filter((node) => node.parentId === ROOT_ID);
 
     await saveWebPageNode({
       name: title,
