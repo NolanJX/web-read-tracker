@@ -55,7 +55,10 @@ export async function fetchFavicon(url: string): Promise<Favicon> {
 export async function migrateFaviconStorage(): Promise<void> {
   // const domainToFavicon = storage.defineItem<Record<Domain, Favicon>>("local:domainToFavicon", { fallback: {} });
 
-  const oldStorage = await storage.getItem("local:domainToFavicon");
+  const oldStorage = (await storage.getItem("local:domainToFavicon")) as Record<
+    Domain,
+    Favicon
+  > | null;
   if (oldStorage === null || Object.keys(oldStorage).length === 0) return;
 
   await storage.setItems(
