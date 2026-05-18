@@ -24,23 +24,20 @@ export async function findWebPage(url: string): Promise<WebPage | undefined> {
 }
 
 export async function saveWebPage(
-  webPage: Partial<WebPage> &
+  item: Partial<WebPage> &
     Pick<WebPage, "url" | "title" | "status" | "readCount">,
 ): Promise<WebPage> {
   const existing = await findAllWebPages();
-  const index = existing.findIndex((w) => w.url === webPage.url);
-
+  const index = existing.findIndex((w) => w.url === item.url);
   const now = Date.now();
 
+  let webPage: WebPage;
+
   if (index >= 0) {
-    webPage = { ...existing[index], updatedAt: now, ...webPage } as WebPage;
+    webPage = { ...existing[index], updatedAt: now, ...item };
     existing[index] = webPage;
   } else {
-    webPage = {
-      createdAt: now,
-      updatedAt: now,
-      ...webPage,
-    } as WebPage;
+    webPage = { createdAt: now, updatedAt: now, ...item };
     existing.push(webPage);
   }
 
