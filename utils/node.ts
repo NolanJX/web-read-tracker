@@ -35,7 +35,7 @@ export async function findWebPageNodesByUrl(
   const existing = await findAllNodes();
   return existing.filter(
     (node) => node.type === "WebPage" && node.webPageUrl === webPageUrl,
-  );
+  ) as WebPageNode[];
 }
 
 export async function existsWebPageNodeByUrl(
@@ -49,7 +49,7 @@ export async function existsWebPageNodeByUrl(
 
 export async function createRootNode(): Promise<FolderNode> {
   const now = Date.now();
-  const node = {
+  const node: FolderNode = {
     id: ROOT_ID,
     name: "Root",
     parentId: null,
@@ -64,22 +64,20 @@ export async function createRootNode(): Promise<FolderNode> {
 }
 
 export async function saveNode(
-  node: Partial<Node> & Pick<Node, "name" | "parentId" | "order" | "type">,
+  item: Partial<Node> & Pick<Node, "name" | "parentId" | "order" | "type">,
 ): Promise<Node> {
   const existing = await nodes.getValue();
   const now = Date.now();
 
-  if (node.id != null) {
-    const index = existing.findIndex((n) => n.id === node.id);
+  let node: Node;
+
+  if (item.id != null) {
+    const index = existing.findIndex((n) => n.id === item.id);
     if (index >= 0) {
-      node = { ...existing[index], updatedAt: now, ...node } as Node;
+      node = { ...existing[index], updatedAt: now, ...item } as Node;
       existing[index] = node;
     } else {
-      node = {
-        createdAt: now,
-        updatedAt: now,
-        ...node,
-      } as Node;
+      node = { createdAt: now, updatedAt: now, ...item } as Node;
       existing.push(node);
     }
   } else {
@@ -87,7 +85,7 @@ export async function saveNode(
       id: crypto.randomUUID(),
       createdAt: now,
       updatedAt: now,
-      ...node,
+      ...item,
     } as Node;
     existing.push(node);
   }
