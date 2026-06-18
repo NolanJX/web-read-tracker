@@ -1,5 +1,7 @@
 # Web Read Tracker
 
+> A browser extension. Doesn't replace bookmarks — adds better ones.
+
 ## Requirements
 
 - Firefox
